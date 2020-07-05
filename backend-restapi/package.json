@@ -1,0 +1,21 @@
+{
+  "name": "medium-restapi",
+  "version": "1.0.0",
+  "description": "Medium - REST API (node, express, mongo) Tutorial",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Emil Almazov",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.10",
+    "mongoose-uuid2": "^2.3.0"
+  },
+  "devDependencies": {
+    "node-uuid": "^1.4.8",
+    "uuid": "^8.2.0"
+  }
+}
