@@ -87,5 +87,7 @@ $RECYCLE.BIN/
 
 
 # Emil stuff
-Backend-restapi/src/templates
-Backend-restapi/mongodbpath
+Backend/src/templates
+Backend/mongodbpath
+Backend/.idea
+Backend-restapi
