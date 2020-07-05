@@ -12,7 +12,7 @@ router.get('/', function (req, res) {
 // ROUTES
 
 // MANAGER
-var managerController = require('./managerController');
+var managerController = require('./controllers/managerController');
 // Manager routes
 router.route('/managers')
     .get(managerController.index)
@@ -24,7 +24,7 @@ router.route('/managers/:manager_id')
     .delete(managerController.delete);
 
 // USER
-var userController = require('./userController');
+var userController = require('./controllers/userController');
 // User routes
 router.route('/users')
     .get(userController.index)
@@ -39,7 +39,7 @@ router.route('/users/:otc')
 
 
 // CONTACT
-var contactController = require('./contactController');
+var contactController = require('./controllers/contactController');
 // Contact routes
 router.route('/contacts')
     .get(contactController.index)

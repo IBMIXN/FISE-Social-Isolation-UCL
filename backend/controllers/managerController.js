@@ -1,6 +1,6 @@
 // managerController.js
 // Import manager model
-Manager = require('./managerModel');
+Manager = require('../models/managerModel');
 // Handle index actions
 exports.index = function (req, res) {
     Manager.get(function (err, managers) {
