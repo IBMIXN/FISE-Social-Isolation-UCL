@@ -84,3 +84,10 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/react,macos,windows,visualstudiocode
+
+
+# Emil stuff
+Backend/debug
+Backend/.idea
+Backend-restapi
+Backend/.env
