@@ -4,23 +4,45 @@
   "description": "FISE Project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "source .env && nodemon index.js",
+    "build": "next build",
+    "start": "node index.js"
   },
   "author": "Emil Almazov",
   "license": "ISC",
   "dependencies": {
+    "@chakra-ui/core": "^0.8.0",
+    "@emotion/core": "^10.0.28",
+    "@emotion/styled": "^10.0.27",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "cross-env": "^7.0.2",
+    "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
+    "emotion-theming": "^10.0.27",
     "express": "^4.17.1",
+    "facepaint": "^1.2.1",
     "mongoose": "^5.9.10",
     "mongoose-uuid2": "^2.3.0",
+    "next": "^9.4.4",
+    "next-compose-plugins": "^2.2.0",
+    "next-optimized-images": "^2.6.1",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "polished": "^3.6.5",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-helmet": "^6.1.0",
+    "react-hook-form": "^6.0.1",
+    "react-loading-skeleton": "^2.1.1",
+    "swr": "^0.2.3",
+    "typescript": "^3.9.6"
   },
   "devDependencies": {
+    "@types/node": "^14.0.18",
     "node-uuid": "^1.4.8",
+    "nodemon": "^2.0.4",
     "uuid": "^8.2.0"
   }
 }
