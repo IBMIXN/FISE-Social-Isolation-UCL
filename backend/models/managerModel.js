@@ -17,8 +17,7 @@ var managerSchema = mongoose.Schema({
         required: true
     },
     users: {
-        type: [User.schema],
-        required: true
+        type: [User.schema]
     },
 });
 // Export Manager model

@@ -1,39 +1,38 @@
 // Initialize express router
-let router = require('express').Router();
+const router = require('express').Router();
+const passport = require('passport');
+require('./debug/config/passport')(passport);
 
-// Set default API response
-router.get('/', function (req, res) {
-    res.json({
-        status: 'API Its Working',
-        message: 'Welcome to RESTHub crafted with love!',
-    });
-});
 
 // ROUTES
+router.get('/', function (req, res) {
+    res.json({message: "hello there"});
+}); // NEEDS COMPLETION
 
 // MANAGER
 var managerController = require('./controllers/managerController');
+
 // Manager routes
 router.route('/managers')
-    .get(managerController.index)
-    .post(managerController.new);
+    .get(checkAuthenticated, managerController.index)
+    .post(checkAuthenticated, managerController.new);
 router.route('/managers/:manager_id')
-    .get(managerController.view)
-    .patch(managerController.update)
-    .put(managerController.update)
-    .delete(managerController.delete);
+    .get(checkAuthenticated, managerController.view)
+    .patch(checkAuthenticated, managerController.update)
+    .put(checkAuthenticated, managerController.update)
+    .delete(checkAuthenticated, managerController.delete);
 
 // USER
 var userController = require('./controllers/userController');
 // User routes
 router.route('/users')
-    .get(userController.index)
-    .post(userController.new);
+    .get(checkAuthenticated, userController.index)
+    .post(checkAuthenticated, userController.new);
 router.route('/users/:user_id')
-    // .get(userController.view)
-    .patch(userController.update)
-    .put(userController.update)
-    .delete(userController.delete);
+    // .get(checkAuthenticated, userController.view) // not needed?
+    .patch(checkAuthenticated, userController.update)
+    .put(checkAuthenticated, userController.update)
+    .delete(checkAuthenticated, userController.delete);
 router.route('/users/:otc')
     .get(userController.view)
 
@@ -54,4 +53,9 @@ router.route('/contacts/:contact_id')
 // Export API routes
 module.exports = router;
 
-
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect('/login');
+}

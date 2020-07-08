@@ -1,5 +1,8 @@
 // Import user model
 User = require('../models/userModel');
+Manager = require('../models/managerModel')
+const passport = require('passport');
+
 // Handle index actions
 exports.index = function (req, res) {
     User.get(function (err, users) {
@@ -8,12 +11,13 @@ exports.index = function (req, res) {
                 status: "error",
                 message: err,
             });
+        } else {
+            res.json({
+                status: "success",
+                message: "Users retrieved successfully",
+                data: users
+            });
         }
-        res.json({
-            status: "success",
-            message: "Users retrieved successfully",
-            data: users
-        });
     });
 };
 // Handle create user actions
@@ -36,7 +40,7 @@ exports.new = function (req, res) {
 };
 // Handle view user info
 exports.view = function (req, res) {
-    User.find({otc: req.params.otc}, function (err, user) {
+    User.findOne({otc: req.params.otc}, function (err, user) {
         if (err) {
             res.send(err);
         } else if (isEmpty(user)) {
@@ -50,14 +54,6 @@ exports.view = function (req, res) {
             });
         }
     });
-    // User.findById(req.params.otc, function (err, user) {
-    //     if (err)
-    //         res.send(err);
-    //     res.json({
-    //         message: 'User details loading..',
-    //         data: user
-    //     });
-    // });
 };
 // Handle update user info
 exports.update = function (req, res) {

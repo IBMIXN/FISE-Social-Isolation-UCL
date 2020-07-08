@@ -1,6 +1,8 @@
 // managerController.js
 // Import manager model
 Manager = require('../models/managerModel');
+const bcrypt = require('bcryptjs');
+
 // Handle index actions
 exports.index = function (req, res) {
     Manager.get(function (err, managers) {
@@ -19,19 +21,41 @@ exports.index = function (req, res) {
 };
 // Handle create manager actions
 exports.new = function (req, res) {
-    var manager = new Manager();
-    manager.email = req.body.email ? req.body.email : manager.email;
-    manager.password = req.body.password;
-    manager.users = req.body.users;
-// save the manager and check for errors
-    manager.save(function (err) {
-        if (err)
-            res.json(err);
-        res.json({
-            message: 'New manager created!',
-            data: manager
-        });
-    });
+    let email = req.body.email;
+    Manager.findOne({email: email}, function (err, manager) {
+        let errors = [];
+        if (err) {
+            throw err;
+        } else if (manager) {
+            res.render('register.ejs', {email: email.toString()});
+        } else {
+            let manager = new Manager();
+            manager.email = req.body.email ? req.body.email : manager.email;
+            manager.password = req.body.password;
+            manager.users = req.body.users;
+            // save the manager and check for errors
+            bcrypt.genSalt(10, function (err, salt) {
+                bcrypt.hash(manager.password, salt, function (err, hash) {
+                    if (err) {
+                        // res.json(err);
+                        res.redirect('/register');
+                    }
+                    manager.password = hash;
+                    manager.save(function (err) {
+                        if (err)
+                            res.json(err);
+                        else {
+                            // res.json({
+                            //     message: 'New manager created!',
+                            //     data: manager
+                            // });
+                            res.redirect('/login');
+                        }
+                    });
+                });
+            });
+        }
+    })
 };
 // Handle view manager info
 exports.view = function (req, res) {
@@ -61,11 +85,12 @@ exports.update = function (req, res) {
                 data: manager
             });
         });
+        process.env.SESSION_SECRET = manager._id;
     });
 };
 // Handle delete manager
 exports.delete = function (req, res) {
-    Manager.remove({
+    Manager.deleteMany({
         _id: req.params.manager_id
     }, function (err, manager) {
         if (err)
