@@ -50,6 +50,12 @@ router.route('/contacts/:contact_id')
     .delete(contactController.delete);
 
 
+//TEST
+router.route('/call/:contact_name')
+    .post(contactController.invite);
+//TEST
+
+
 // Export API routes
 module.exports = router;
 

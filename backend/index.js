@@ -53,7 +53,7 @@ app.route('/login')
     })
     .post(checkNotAuthenticated, passport.authenticate('local', {
         successRedirect: '/api/managers',
-        failureRedirect: '/login',
+        failureRedirect: '/',
         failureFlash: true
     }));
 

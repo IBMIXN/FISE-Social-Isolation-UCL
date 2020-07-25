@@ -23,11 +23,10 @@ exports.index = function (req, res) {
 exports.new = function (req, res) {
     let email = req.body.email;
     Manager.findOne({email: email}, function (err, manager) {
-        let errors = [];
         if (err) {
             throw err;
         } else if (manager) {
-            res.render('register.ejs', {email: email.toString()});
+            res.render('register.ejs', {email: email.toString()});  // for testing, replace with Adam frontend
         } else {
             let manager = new Manager();
             manager.email = req.body.email ? req.body.email : manager.email;

@@ -1,4 +1,6 @@
 // contactController.js
+var nodemailer = require('nodemailer');
+
 
 // Import contact model
 Contact = require('../models/contactModel');
@@ -79,3 +81,42 @@ exports.delete = function (req, res) {
         });
     });
 };
+
+
+// Invite contact to call
+exports.invite = function (req, res) {
+    let name = req.params.contact_name;
+    Contact.findOne({firstName: name}, function (err, contact) {
+        if (err) {
+            res.json(err);
+        } else {
+            let transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: "TYPE EMAIL IN HERE", // Using `process.env.USER` doesn't work (not sure why)
+                    pass: process.env.PASS
+                }
+            });
+
+            let mailOptions = {
+                from: 'TYPE EMAIL IN HERE',
+                to: contact.email,
+
+                subject: "Click here to talk to " + req.body.name,
+                text: 'Hello ' + contact.firstName + '! Here\'s your link for your FISE Plaza call with '
+                    + req.body.name + ':\n' + req.body.link
+            };
+
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    res.json(error);
+                } else {
+                    res.json({
+                        message: 'Email sent: ' + info.response,
+                        data: contact
+                    });
+                }
+            });
+        }
+    });
+}
