@@ -71,11 +71,11 @@ app.route("/register")
     })
     .post(checkNotAuthenticated, managerController.new);
 
-app.route('/logout')
-    .get(function (req, res) {
-        req.logout();
-        res.redirect('/login');
-    });
+app.route("/logout").get(function (req, res) {
+    req.logout();
+    res.redirect("/");
+});
+
 app.route("/dashboard").get(checkAuthenticated, function (req, res) {
     const user = req.user;
     res.render("dashboard.ejs", {
@@ -90,7 +90,7 @@ app.route("/dashboard").get(checkAuthenticated, function (req, res) {
 //     failureFlash: true
 // }));
 
-app.use(express.static('public'))
+app.use(express.static("public"));
 
 // Use Api routes in the App
 app.use("/api", apiRoutes);
