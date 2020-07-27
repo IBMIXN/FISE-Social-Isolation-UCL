@@ -84,7 +84,6 @@ exports.update = function (req, res) {
                 data: manager
             });
         });
-        process.env.SESSION_SECRET = manager._id;
     });
 };
 // Handle delete manager
