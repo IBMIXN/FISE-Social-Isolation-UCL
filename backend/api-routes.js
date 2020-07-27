@@ -1,7 +1,7 @@
 // Initialize express router
 const router = require('express').Router();
 const passport = require('passport');
-require('./debug/config/passport')(passport);
+require('./passport')(passport);
 
 
 // ROUTES

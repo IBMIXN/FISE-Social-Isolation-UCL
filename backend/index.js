@@ -6,7 +6,7 @@ const session = require('express-session');
 const passport = require('passport');
 require('dotenv').config();
 Manager = require('./models/managerModel');
-require('./debug/config/passport')(passport);
+require('./passport')(passport);
 
 // Initialise the app
 const app = express();
