@@ -4,9 +4,9 @@ const mongoose = require("mongoose");
 const flash = require("express-flash");
 const session = require("express-session");
 const passport = require("passport");
-require("dotenv").config();
-Manager = require("./models/managerModel");
 require("./passport")(passport);
+
+Manager = require("./models/managerModel");
 
 // Initialise the app
 const app = express();
