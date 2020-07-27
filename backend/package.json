@@ -4,8 +4,9 @@
   "description": "FISE Project",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "build:css": "postcss public/stylesheets/tailwind.css -o public/stylesheets/style.css",
+    "start": "source .env && npm run build:css && node index.js",
+    "dev": "source .env && npm run build:css && nodemon index.js"
   },
   "author": "Emil Almazov",
   "license": "ISC",
@@ -21,7 +22,8 @@
     "mongoose-uuid2": "^2.3.0",
     "nodemailer": "^6.4.10",
     "passport": "^0.4.1",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "tailwindcss": "^1.5.2"
   },
   "devDependencies": {
     "node-uuid": "^1.4.8",

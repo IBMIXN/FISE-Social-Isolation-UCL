@@ -8,6 +8,10 @@ var managerSchema = mongoose.Schema({
         type: String,
         default: uuid.v4()
     },
+    name: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true

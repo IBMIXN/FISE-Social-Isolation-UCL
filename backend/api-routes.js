@@ -13,7 +13,7 @@ router.get('/', function (req, res) {
 var managerController = require('./controllers/managerController');
 
 // Manager routes
-router.route('/managers')
+router.route('/managers') // REMOVE IN FINAL
     .get(checkAuthenticated, managerController.index)
     .post(checkAuthenticated, managerController.new);
 router.route('/managers/:manager_id')

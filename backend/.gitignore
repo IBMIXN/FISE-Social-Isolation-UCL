@@ -1,0 +1,5 @@
+debug/
+.idea/
+.env
+.next/
+public/stylesheets/style.css
