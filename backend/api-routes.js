@@ -5,8 +5,8 @@ require('./passport')(passport);
 
 
 // ROUTES
-router.get('/', function (req, res) {
-    res.json({message: "hello there"});
+router.get('/', checkAuthenticated, function (req, res) {
+    res.render('index.ejs', {name: "emil"});
 }); // NEEDS COMPLETION
 
 // MANAGER
@@ -21,6 +21,11 @@ router.route('/managers/:manager_id')
     .patch(checkAuthenticated, managerController.update)
     .put(checkAuthenticated, managerController.update)
     .delete(checkAuthenticated, managerController.delete);
+// router.route('/logout')
+//     .get(function (req, res) {
+//         req.logout();
+//         res.redirect('/login');
+//     });
 
 // USER
 var userController = require('./controllers/userController');

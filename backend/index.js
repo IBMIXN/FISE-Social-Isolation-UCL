@@ -42,7 +42,7 @@ app.set('view-engine', 'ejs');
 
 // Send message for default URL
 app.get('/', (req, res) => {
-    res.render('index.ejs', {name: "emil"});
+    res.json({message: "hello there"});
 });
 
 
@@ -52,8 +52,8 @@ app.route('/login')
         res.render('login.ejs');
     })
     .post(checkNotAuthenticated, passport.authenticate('local', {
-        successRedirect: '/api/managers',
-        failureRedirect: '/',
+        successRedirect: '/api',       // this is where admin panel would go
+        failureRedirect: '/register',
         failureFlash: true
     }));
 
@@ -63,6 +63,11 @@ app.route('/register')
     })
     .post(checkNotAuthenticated, managerController.new);
 
+app.route('/logout')
+    .get(function (req, res) {
+        req.logout();
+        res.redirect('/login');
+    });
 
 // Use Api routes in the App
 app.use('/api', apiRoutes);
@@ -73,7 +78,7 @@ app.listen(port, function () {
 
 function checkNotAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
-        return res.redirect('./api/managers');
+        return res.redirect('./api');
     }
     next();
 }
