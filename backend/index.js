@@ -1,38 +1,49 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
-const flash = require("express-flash");
-const session = require("express-session");
-const passport = require("passport");
-require("./passport")(passport);
-
-Manager = require("./models/managerModel");
-
 // Initialise the app
+const express = require("express");
 const app = express();
 
-// Import routes
-let apiRoutes = require("./api-routes");
-// Configure bodyparser to handle post requests
+
+// BodyParser setup
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
 app.use(
     bodyParser.urlencoded({
         extended: true,
     })
 );
-app.use(bodyParser.json());
 
-app.use(flash());
+
+// Session setup
+const session = require("express-session");
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        // cookie: {secure: true}
     })
 );
+
+
+// Passport setup
+const passport = require("passport");
+require("./passport")(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Connecting to DB
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) return res.redirect("/dashboard");
+    next();
+}
+
+function checkAuthenticated(req, res, next) {
+    if (!req.isAuthenticated()) return res.redirect("/login");
+    next();
+}
+
+
+// DB Connection
+const mongoose = require("mongoose");
 mongoose
     .connect(process.env.MONGO_URI, {
         useNewUrlParser: true,
@@ -41,17 +52,25 @@ mongoose
     .then(() => console.log("MongoDB Atlas connected successfully"))
     .catch((err) => console.log(err));
 
-// Setup server port
-var port = process.env.PORT || 8080;
 
+// Import routes
+let apiRoutes = require("./api-routes");
+app.use("/api", apiRoutes);
+
+// Flash messages setup
+const flash = require("express-flash");
+app.use(flash());
+
+// Views Setup
 app.set("view-engine", "ejs");
+app.use(express.static("public"));
 
-// Send message for default URL
+
+// ---------------- Define Views ------------------
 app.get("/", (req, res) => {
-    res.render("index.ejs", { name: "emil" });
+    res.render("index.ejs");
 });
 
-let managerController = require("./controllers/managerController");
 app.route("/login")
     .get(checkNotAuthenticated, function (req, res) {
         res.render("login.ejs");
@@ -65,6 +84,7 @@ app.route("/login")
         })
     );
 
+const managerController = require("./controllers/managerController");
 app.route("/register")
     .get(checkNotAuthenticated, function (req, res) {
         res.render("register.ejs", { email: "" });
@@ -90,26 +110,10 @@ app.route("/dashboard").get(checkAuthenticated, function (req, res) {
 //     failureFlash: true
 // }));
 
-app.use(express.static("public"));
+// Setup server port
+var port = process.env.PORT || 8080;
 
-// Use Api routes in the App
-app.use("/api", apiRoutes);
 // Launch app to listen to specified port
 app.listen(port, function () {
     console.log("Running FISE on port " + port);
 });
-
-function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return res.redirect("/dashboard");
-    }
-    next();
-}
-
-function checkAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        next();
-    } else {
-        return res.redirect("/login");
-    }
-}
