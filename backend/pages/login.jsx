@@ -1,9 +1,20 @@
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/router";
 
 export default function LoginPage() {
+    const router = useRouter();
+
     const { handleSubmit, register, errors } = useForm();
-    const onSubmit = (values) => {
-        console.log(values);
+    const onSubmit = async (values) => {
+        const response = await fetch("/api/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(values)
+          });
+      
+          if (response.ok) {
+            return router.push("/dashboard");
+          }
     };
 
     return (

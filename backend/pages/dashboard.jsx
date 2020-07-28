@@ -1,3 +1,4 @@
+import React from "react";
 import { withIronSession } from "next-iron-session";
 
 function DashboardPage({ user }) {
@@ -26,7 +27,7 @@ export const getServerSideProps = withIronSession(
         };
     },
     {
-        cookieName: "MYSITECOOKIE",
+        cookieName: "FISEAUTHCOOKIE",
         cookieOptions: {
             secure: process.env.NODE_ENV === "production" ? true : false,
         },
