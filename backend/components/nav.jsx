@@ -1,18 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title><%= title %> | FISE Plaza</title>
-        <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
-    </head>
-    <body>
-        <nav
-            class="flex items-center justify-between flex-wrap bg-blue-500 p-6"
-        >
-            <a href="/" class="flex items-center flex-shrink-0 text-white mr-6">
+import Link from "next/link";
+
+const links = [{ href: "/login", label: "Dashboard" }];
+
+export default function Nav() {
+    return (
+        // <nav>
+        //     <ul className="flex justify-between items-center p-8">
+        //         <li>
+        //             <Link href="/">
+        //                 <a className="text-blue-500 no-underline">Home</a>
+        //             </Link>
+        //         </li>
+        //         <ul className="flex justify-between items-center space-x-4">
+        //             {links.map(({ href, label }) => (
+        //                 <li key={`${href}${label}`}>
+        //                     <a href={href} className="btn-blue no-underline">
+        //                         {label}
+        //                     </a>
+        //                 </li>
+        //             ))}
+        //         </ul>
+        //     </ul>
+        // </nav>
+        <nav className="flex items-center justify-between flex-wrap bg-blue-500 p-6">
+            <a
+                href="/"
+                className="flex items-center flex-shrink-0 text-white mr-6"
+            >
                 <svg
-                    class="fill-current h-8 w-8 mr-2"
+                    className="fill-current h-8 w-8 mr-2"
                     width="54"
                     height="54"
                     width="18px"
@@ -20,7 +36,6 @@
                     viewBox="0 0 18 20"
                     version="1.1"
                     xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
                 >
                     <defs>
                         <linearGradient
@@ -30,8 +45,8 @@
                             y2="100%"
                             id="linearGradient-1"
                         >
-                            <stop stop-color="#2D73DF" offset="0%"></stop>
-                            <stop stop-color="#3165FF" offset="100%"></stop>
+                            <stop stopColor="#2D73DF" offset="0%"></stop>
+                            <stop stopColor="#3165FF" offset="100%"></stop>
                         </linearGradient>
                         <linearGradient
                             x1="27.7777778%"
@@ -40,16 +55,16 @@
                             y2="100%"
                             id="linearGradient-2"
                         >
-                            <stop stop-color="#0C5ED6" offset="0%"></stop>
-                            <stop stop-color="#0530AD" offset="100%"></stop>
+                            <stop stopColor="#0C5ED6" offset="0%"></stop>
+                            <stop stopColor="#0530AD" offset="100%"></stop>
                         </linearGradient>
                     </defs>
                     <g
                         id="Page-1"
                         stroke="none"
-                        stroke-width="1"
+                        strokeWidth="1"
                         fill="none"
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                     >
                         <g
                             id="Logo"
@@ -70,16 +85,14 @@
                         </g>
                     </g>
                 </svg>
-                <span class="font-semibold text-xl tracking-tight"
-                    >FISE Plaza</span
-                >
+                <span className="font-semibold text-xl tracking-tight">
+                    FISE Plaza
+                </span>
             </a>
-            <div class="block lg:hidden">
-                <button
-                    class="flex items-center px-3 py-2 border rounded text-blue-200 border-blue-400 hover:text-white hover:border-white"
-                >
+            <div className="block lg:hidden">
+                <button className="flex items-center px-3 py-2 border rounded text-blue-200 border-blue-400 hover:text-white hover:border-white">
                     <svg
-                        class="fill-current h-3 w-3"
+                        className="fill-current h-3 w-3"
                         viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg"
                     >
@@ -88,41 +101,25 @@
                     </svg>
                 </button>
             </div>
-            <div
-                class="w-full block flex-grow lg:flex lg:items-center lg:w-auto"
-            >
-                <a
-                    href="/dashboard"
-                    class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4"
-                >
-                    Dashboard
-                </a>
-                <!-- <div class="text-sm lg:flex-grow">
-                    <a
-                        href="#responsive-header"
-                        class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4"
-                    >
-                        Docs
-                    </a>
-                    <a
-                        href="#responsive-header"
-                        class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4"
-                    >
-                        Examples
-                    </a>
-                    <a
-                        href="#responsive-header"
-                        class="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white"
-                    >
-                        Blog
-                    </a>
-                </div> -->
+            <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
+                <div className="text-sm lg:flex-grow">
+                    {links.map(({ href, label }) => (
+                        <Link href={href} key={href+label}>
+                            <a className="block mt-4 lg:inline-block lg:mt-0 text-blue-200 hover:text-white mr-4">
+                                {label}
+                            </a>
+                        </Link>
+                    ))}
+                </div>
                 <div>
                     <a
                         href="/login"
-                        class="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0"
-                        >Get Started</a
+                        className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0"
                     >
+                        Go to App
+                    </a>
                 </div>
             </div>
         </nav>
+    );
+}
