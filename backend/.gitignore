@@ -3,3 +3,5 @@ debug/
 .env
 .next/
 public/stylesheets/style.css
+env_vars.yaml
+node_modules/

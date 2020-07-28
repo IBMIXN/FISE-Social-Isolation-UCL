@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build:css": "postcss public/stylesheets/tailwind.css -o public/stylesheets/style.css",
-    "start": "source .env && npm run build:css && node index.js",
+    "gcp-build": "npm i",
+    "start": "node index.js",
     "dev": "source .env && npm run build:css && nodemon index.js"
   },
   "author": "Emil Almazov",
@@ -22,10 +23,11 @@
     "nodemailer": "^6.4.10",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "tailwindcss": "^1.5.2"
-  },
-  "devDependencies": {
+    "tailwindcss": "^1.5.2",
     "node-uuid": "^1.4.8",
     "uuid": "^8.2.0"
+  },
+  "devDependencies": {
+    "postcss-cli": "^7.1.1"
   }
 }
