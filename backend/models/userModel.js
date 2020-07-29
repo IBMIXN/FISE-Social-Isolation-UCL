@@ -22,11 +22,11 @@ var userSchema = mongoose.Schema({
     },
     imageVideoUrl: {
         type: [String],
-        required: true
+        // required: true
     },
     Contacts: {
         type: [Contact.schema],
-        required: true
+        // required: true
     },
 });
 // Export User model

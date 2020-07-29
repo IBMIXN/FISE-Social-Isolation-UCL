@@ -21,22 +21,17 @@ router.route('/managers/:manager_id')
     .patch(checkAuthenticated, managerController.update)
     .put(checkAuthenticated, managerController.update)
     .delete(checkAuthenticated, managerController.delete);
-// router.route('/logout')
-//     .get(function (req, res) {
-//         req.logout();
-//         res.redirect('/login');
-//     });
 
 // USER
 var userController = require('./controllers/userController');
 // User routes
 router.route('/users')
     .get(checkAuthenticated, userController.index)
-    .post(checkAuthenticated, userController.new);
+    .post(/*checkAuthenticated,*/ userController.new);  // commented for DEBUG reasons, TO-DO: uncomment in final build
 router.route('/users/:user_id')
     // .get(checkAuthenticated, userController.view) // not needed?
     .patch(checkAuthenticated, userController.update)
-    .put(checkAuthenticated, userController.update)
+    .put(/*checkAuthenticated,*/ userController.update)
     .delete(checkAuthenticated, userController.delete);
 router.route('/users/:otc')
     .get(userController.view)
@@ -47,18 +42,16 @@ var contactController = require('./controllers/contactController');
 // Contact routes
 router.route('/contacts')
     .get(contactController.index)
-    .post(contactController.new);
+// .post(contactController.new); not needed?
+router.route('/contacts/:user_id')
+    .post(contactController.new)
 router.route('/contacts/:contact_id')
     .get(contactController.view)
     .patch(contactController.update)
     .put(contactController.update)
-    .delete(contactController.delete);
-
-
-//TEST
+    .delete(contactController.delete)
 router.route('/call/:contact_name')
     .post(contactController.invite);
-//TEST
 
 
 // Export API routes

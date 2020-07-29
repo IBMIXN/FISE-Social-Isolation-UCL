@@ -22,11 +22,11 @@ exports.index = function (req, res) {
 // Handle create manager actions
 exports.new = function (req, res) {
     let email = req.body.email;
-    Manager.findOne({ email: email }, function (err, manager) {
+    Manager.findOne({email: email}, function (err, manager) {
         if (err) {
             throw err;
         } else if (manager) {
-            res.render("register.ejs", { email: email.toString() }); // for testing, replace with Adam frontend
+            res.render("register.ejs", {email: email.toString()}); // for testing, replace with Adam frontend
         } else {
             let manager = new Manager();
             manager.email = req.body.email ? req.body.email : manager.email;

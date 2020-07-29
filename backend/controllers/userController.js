@@ -27,7 +27,7 @@ exports.new = function (req, res) {
     user.otc = req.body.otc;
     user.otcIsValid = req.body.otcIsValid;
     user.imageVideoUrl = req.body.imageVideoUrl;
-    user.Contacts = req.body.Contacts;
+    user.Contacts = req.body.Contacts; // TO-DO: might need deleting
 // save the user and check for errors
     user.save(function (err) {
         if (err)
@@ -61,11 +61,11 @@ exports.update = function (req, res) {
         if (err)
             res.send(err);
         user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
-        user.otc = req.body.otc;
-        user.otcIsValid = req.body.otcIsValid;
-        user.imageVideoUrl = req.body.imageVideoUrl;
-        user.Contacts = req.body.Contacts;
-// save the user and check for errors
+        user.otc = req.body.otc ? req.body.otc : user.otc;
+        user.otcIsValid = req.body.otcIsValid ? req.body.otcIsValid : user.otcIsValid;
+        user.imageVideoUrl = req.body.imageVideoUrl ? req.body.imageVideoUrl : user.imageVideoUrl;
+        user.Contacts = req.body.Contacts ? req.body.Contacts : user.Contacts;
+        // save the user and check for errors
         user.save(function (err) {
             if (err)
                 res.json(err);

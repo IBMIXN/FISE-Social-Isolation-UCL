@@ -9,19 +9,19 @@ var contactSchema = mongoose.Schema({
     },
     firstName: {
         type: String,
-        required: true
+        // required: true
     },
     avatarImage: {
         type: String,
-        required: true
+        // required: true
     },
     email: {
         type: String,
-        required: true
+        // required: true
     },
     relation: {
         type: Number,
-        required: true
+        // required: true
     },
 });
 // Export Contact model
