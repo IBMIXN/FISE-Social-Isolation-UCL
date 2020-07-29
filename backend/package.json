@@ -18,14 +18,14 @@
     "express": "^4.17.1",
     "express-flash": "0.0.2",
     "express-session": "^1.17.1",
-    "mongoose": "^5.9.10",
+    "mongoose": "^5.9.26",
     "mongoose-uuid2": "^2.3.0",
+    "node-uuid": "^1.4.8",
     "nodemailer": "^6.4.10",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "tailwindcss": "^1.5.2",
-    "node-uuid": "^1.4.8",
-    "uuid": "^8.2.0"
+    "uuid": "^8.3.0"
   },
   "devDependencies": {
     "postcss-cli": "^7.1.1"
