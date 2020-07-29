@@ -82,13 +82,8 @@ exports.update = function (req, res) {
             // finds ONE user that has a Contact with `contact_id` in it
             // (TO-DO: might need to change `findOne` later when multiple users have same Contact)
             User.findOne({"Contacts._id": contact._id}, function (err, user) {
-                // we need the actual Contact object itself not the whole user
-                let contactObject = user.Contacts.find(function (contact2) {
-                    return contact2._id = contact._id;
-                });
-
-                // need to access the right Contact in the array so that we can update it
-                let index = user.Contacts.indexOf(contactObject);
+                // need index so that we change the correct User in the array
+                let index = user.Contacts.findIndex(contact2 => contact2._id === contact._id);
 
                 if (err) {
                     res.json(err);
@@ -112,24 +107,30 @@ exports.update = function (req, res) {
 // DELETE - delete specific contact by `contact_id`
 exports.delete = function (req, res) {
     Contact.findById(req.params.contact_id, function (err, contact) {
-        User.findOne({"Contacts._id": contact._id}, function (err, user) {
-            // First, remove Contact from User's "Contacts" array
-            user.Contacts.remove(contact);
-            user.save(function () {
-                // Secondly, remove Contact from actual Contact schema
-                Contact.deleteOne({
-                    _id: req.params.contact_id
-                }, function (err) {
-                    if (err)
-                        res.send(err);
-                    res.json({
-                        status: "success",
-                        message: 'Contact deleted',
-                        data: user
+        if (contact) {
+            User.findOne({"Contacts._id": contact._id}, function (err, user) {
+                // First, remove Contact from User's "Contacts" array
+                user.Contacts.remove(contact);
+                user.save(function () {
+                    // Secondly, remove Contact from actual Contact schema
+                    Contact.deleteOne({
+                        _id: req.params.contact_id
+                    }, function (err) {
+                        if (err)
+                            res.send(err);
+                        res.json({
+                            status: "success",
+                            message: 'Contact deleted',
+                            data: user
+                        });
                     });
                 });
             });
-        });
+        } else {
+            res.json({
+                message: "ERROR: Contact does not exist! Perhaps you entered a User ID?"
+            })
+        }
     });
 };
 
