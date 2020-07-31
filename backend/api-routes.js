@@ -28,27 +28,27 @@ var userController = require('./controllers/userController');
 router.route('/users')
     .get(checkAuthenticated, userController.index)
     .post(/*checkAuthenticated,*/ userController.new);  // commented for DEBUG reasons, TO-DO: uncomment in final build
-router.route('/users/:user_id')
-    // .get(checkAuthenticated, userController.view) // not needed?
+router.route('/users/:otc/:user_id')
+    .get(checkAuthenticated, userController.view)
     .patch(checkAuthenticated, userController.update)
     .put(/*checkAuthenticated,*/ userController.update)
     .delete(checkAuthenticated, userController.delete);
-router.route('/users/:otc')
-    .get(userController.view)
+/*router.route('/users/:otc')
+    .get(userController.view)*/
 
 
 // CONTACT
 var contactController = require('./controllers/contactController');
 // Contact routes
+// TO-DO: assign 'checkAuthenticated' to each route
 router.route('/contacts')
     .get(contactController.index)
-// .post(contactController.new); not needed?
-router.route('/contacts/:user_id')
-    .post(contactController.new)
 router.route('/contacts/:contact_id')
-    .get(contactController.view)
     .patch(contactController.update)
     .put(contactController.update)
+router.route('/contacts/:user_id/:contact_id?')
+    .get(contactController.view)
+    .post(contactController.new)
     .delete(contactController.delete)
 router.route('/call/:contact_name')
     .post(contactController.invite);
