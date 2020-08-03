@@ -8,10 +8,10 @@ var managerSchema = mongoose.Schema({
         type: String,
         default: uuid.v4()
     },
-    name: {
+    /*name: { // TO-DO: not needed?
         type: String,
         required: true,
-    },
+    },*/
     email: {
         type: String,
         required: true
@@ -20,7 +20,7 @@ var managerSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    users: {
+    Users: {
         type: [User.schema]
     },
 });
