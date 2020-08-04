@@ -32,7 +32,7 @@ exports.new = function (req, res) {
         }
         // FIRST check if User exists
         if (user) {
-            // SECOND, check if Contact exists in Contact model/schema
+            // SECOND, check if Contact already exists in DB
             let contact;
             Contact.findById(req.body._id, function (err, cont) {
                 if (!cont) {

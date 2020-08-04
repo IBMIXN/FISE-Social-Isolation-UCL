@@ -7,7 +7,7 @@ require('./passport')(passport);
 // ROUTES
 router.get('/', checkAuthenticated, function (req, res) {
     res.render('index.ejs', {name: "emil"});
-}); // NEEDS COMPLETION
+}); // TO-DO: NEEDS COMPLETION
 
 // MANAGER
 var managerController = require('./controllers/managerController');
@@ -27,14 +27,14 @@ var userController = require('./controllers/userController');
 // User routes
 router.route('/users')
     .get(checkAuthenticated, userController.index)
-    .post(/*checkAuthenticated,*/ userController.new);  // commented for DEBUG reasons, TO-DO: uncomment in final build
-router.route('/users/:otc/:user_id')
+    .post(checkAuthenticated, userController.new);
+router.route('/users/otc/:otc')
+    .get(checkAuthenticated, userController.view);
+router.route('/users/:user_id')
     .get(checkAuthenticated, userController.view)
     .patch(checkAuthenticated, userController.update)
-    .put(/*checkAuthenticated,*/ userController.update)
+    .put(checkAuthenticated, userController.update)
     .delete(checkAuthenticated, userController.delete);
-/*router.route('/users/:otc')
-    .get(userController.view)*/
 
 
 // CONTACT

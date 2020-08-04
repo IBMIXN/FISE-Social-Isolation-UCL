@@ -1,11 +1,10 @@
 // Import user model
 User = require('../models/userModel');
 Manager = require('../models/managerModel')
-const passport = require('passport');
 
 // Handle index actions
 exports.index = function (req, res) {
-    User.get(function (err, users) {
+    Manager.findById(req.user._id, function (err, manager) {
         if (err) {
             res.json({
                 status: "error",
@@ -15,35 +14,67 @@ exports.index = function (req, res) {
             res.json({
                 status: "success",
                 message: "Users retrieved successfully",
-                data: users
+                data: manager.Users
             });
         }
     });
 };
 // Handle create user actions
 exports.new = function (req, res) {
-    var user = new User();
-    user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
-    user.otc = req.body.otc;
-    user.otcIsValid = req.body.otcIsValid;
-    user.imageVideoUrl = req.body.imageVideoUrl;
-    user.Contacts = req.body.Contacts; // TO-DO: might need deleting
-// save the user and check for errors
-    user.save(function (err) {
-        if (err)
+    let user;
+    User.findOne({
+        firstName: req.body.firstName,
+        otc: req.body.otc,
+        otcIsValid: req.body.otcIsValid
+    }, function (err, usr) {
+        if (err) {
             res.json(err);
-        res.json({
-            message: 'New user created!',
-            data: user
-        });
+        }
+
+        if (usr) {
+            req.user.Users.push(usr);
+            req.user.save(function (err) {
+                if (err) {
+                    res.json(err);
+                }
+                res.json({
+                    message: "User added to " + req.user.email + '!',
+                    data: req.user
+                })
+            });
+        } else {
+            user = new User();
+            user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
+            user.otc = req.body.otc;
+            user.otcIsValid = req.body.otcIsValid;
+            user.imageVideoUrl = req.body.imageVideoUrl;
+
+            req.user.Users.push(user);
+
+            req.user.save(function (err) {
+                if (err) {
+                    res.json(err);
+                }
+                // save the user and check for errors
+                user.save(function (err) {
+                    if (err)
+                        res.json(err);
+                    res.json({
+                        message: 'New user created & added to ' + req.user.email + '!',
+                        data: req.user
+                    });
+                });
+            });
+        }
     });
 };
+
 // Handle view user info
 exports.view = function (req, res) {
     User.findOne({otc: req.params.otc}, function (err, user) {
         if (err) {
             res.send(err);
-        } else if (isEmpty(user)) {
+        } else if (!user) {
             res.json({
                 message: "OTC doesn't exist"
             });
@@ -60,42 +91,79 @@ exports.update = function (req, res) {
     User.findById(req.params.user_id, function (err, user) {
         if (err)
             res.send(err);
-        user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
-        user.otc = req.body.otc ? req.body.otc : user.otc;
-        user.otcIsValid = req.body.otcIsValid ? req.body.otcIsValid : user.otcIsValid;
-        user.imageVideoUrl = req.body.imageVideoUrl ? req.body.imageVideoUrl : user.imageVideoUrl;
-        user.Contacts = req.body.Contacts ? req.body.Contacts : user.Contacts;
-        // save the user and check for errors
-        user.save(function (err) {
-            if (err)
-                res.json(err);
-            res.json({
-                message: 'User Info updated',
-                data: user
+
+        if (user) {
+            Manager.findById(req.user._id, function (err, manager) {
+                if (manager.Users.find(user2 => user2._id === user._id)) {
+                    user.firstName = req.body.firstName ? req.body.firstName : user.firstName;
+                    user.otc = req.body.otc ? req.body.otc : user.otc;
+                    user.otcIsValid = req.body.otcIsValid ? req.body.otcIsValid : user.otcIsValid;
+                    user.imageVideoUrl = req.body.imageVideoUrl ? req.body.imageVideoUrl : user.imageVideoUrl;
+                    user.Contacts = req.body.Contacts ? req.body.Contacts : user.Contacts;
+
+                    // need index so that we change the correct User in the array
+                    let index = manager.Users.findIndex(user2 => user2._id === user._id);
+
+                    manager.Users[index] = user;
+
+                    manager.save(function (err) {
+                        if (err) {
+                            res.json(err);
+                        }
+                        // save the user and check for errors
+                        user.save(function (err) {
+                            if (err)
+                                res.json(err);
+                            res.json({
+                                message: 'User Info updated',
+                                data: user
+                            });
+                        });
+                    });
+                } else {
+                    res.json("ERROR: You do not have access to this User!");
+                }
             });
-        });
+        } else {
+            res.json("ERROR: User does not exist!");
+        }
     });
 };
 // Handle delete user
 exports.delete = function (req, res) {
-    User.deleteMany({
-        _id: req.params.user_id
-    }, function (err, user) {
-        if (err)
-            res.send(err);
-        res.json({
-            status: "success",
-            message: 'User deleted'
-        });
+    User.findById(req.params.user_id, function (err, user) {
+        if (user) {
+            if (req.user.Users.find(user2 => user2._id === user._id)) {
+                req.user.Users.remove(user);
+
+                req.user.save(function (err) {
+                    if (err) {
+                        res.json(err);
+                    }
+
+                    Manager.find({"Users._id": user._id}, function (err, managers) {
+                        if (!managers.length) {
+                            User.deleteOne({
+                                _id: req.params.user_id
+                            }, function (err) {
+                                if (err)
+                                    res.send(err);
+                                res.json({
+                                    status: "success",
+                                    message: 'User deleted from ' + req.user.email + ' and DB.',
+                                    data: req.user
+                                });
+                            });
+                        } else {
+                            res.json('User removed from ' + req.user.email + "!");
+                        }
+                    });
+                });
+            } else {
+                res.json("ERROR: You do not have access to this User!");
+            }
+        } else {
+            res.json("ERROR: No User found!");
+        }
     });
 };
-
-// Used for when OTC doesn't exist
-// https://coderwall.com/p/_g3x9q/how-to-check-if-javascript-object-is-empty
-function isEmpty(obj) {
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key))
-            return false;
-    }
-    return true;
-}
