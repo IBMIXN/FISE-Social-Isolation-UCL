@@ -71,21 +71,17 @@ exports.new = function (req, res) {
 
 // Handle view user info
 exports.view = function (req, res) {
-    User.findOne({otc: req.params.otc}, function (err, user) {
-        if (err) {
-            res.send(err);
-        } else if (!user) {
-            res.json({
-                message: "OTC doesn't exist"
-            });
-        } else {
-            res.json({
-                message: 'User details loading..',
-                data: user
-            });
-        }
-    });
+    let user = req.user.Users.find(usr => usr.otc === req.params.otc || usr._id === req.params.user_id);
+    if (user) {
+        res.json({
+            message: 'User details loading..',
+            data: user
+        });
+    } else {
+        res.json("ERROR: You do not have access to this User or they do not exist!");
+    }
 };
+
 // Handle update user info
 exports.update = function (req, res) {
     User.findById(req.params.user_id, function (err, user) {
