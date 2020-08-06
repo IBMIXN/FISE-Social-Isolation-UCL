@@ -113,7 +113,7 @@ app.route("/dashboard").get(checkAuthenticated, function (req, res) {
 // }));
 
 // Setup server port
-var port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 // Launch app to listen to specified port
 app.listen(port, function () {

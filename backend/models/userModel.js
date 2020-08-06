@@ -1,9 +1,11 @@
 // userModelTemplate.js
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const uuid = require('node-uuid');
+
 Contact = require('./contactModel');
-var uuid = require('node-uuid');
+
 // Setup schema
-var userSchema = mongoose.Schema({
+const userSchema = mongoose.Schema({
     _id: {
         type: String,
         default: uuid.v4()
@@ -30,7 +32,7 @@ var userSchema = mongoose.Schema({
     },
 });
 // Export User model
-var User = module.exports = mongoose.model('user', userSchema);
+const User = module.exports = mongoose.model('user', userSchema);
 module.exports.get = function (callback, limit) {
     User.find(callback).limit(limit);
 }

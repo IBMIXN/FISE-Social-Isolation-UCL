@@ -1,9 +1,11 @@
 // managerModel.js
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const uuid = require('node-uuid');
+
 User = require('./userModel');
-var uuid = require('node-uuid');
+
 // Setup schema
-var managerSchema = mongoose.Schema({
+const managerSchema = mongoose.Schema({
     _id: {
         type: String,
         default: uuid.v4()
@@ -25,7 +27,7 @@ var managerSchema = mongoose.Schema({
     },
 });
 // Export Manager model
-var Manager = module.exports = mongoose.model('manager', managerSchema);
+const Manager = module.exports = mongoose.model('manager', managerSchema);
 module.exports.get = function (callback, limit) {
     Manager.find(callback).limit(limit);
 }

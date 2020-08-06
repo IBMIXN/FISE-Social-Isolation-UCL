@@ -1,15 +1,15 @@
 // contactModelTemplate.js
-var mongoose = require('mongoose');
-var uuid = require('node-uuid');
+const mongoose = require('mongoose');
+const uuid = require('node-uuid');
 // Setup schema
-var contactSchema = mongoose.Schema({
+const contactSchema = mongoose.Schema({
     _id: {
         type: String,
         default: uuid.v4()
     },
     firstName: {
         type: String,
-        // required: true
+        required: true
     },
     avatarImage: {
         type: String,
@@ -17,15 +17,15 @@ var contactSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        // required: true
+        required: true
     },
     relation: {
         type: Number,
-        // required: true
+        required: true
     },
 });
 // Export Contact model
-var Contact = module.exports = mongoose.model('contact', contactSchema);
+const Contact = module.exports = mongoose.model('contact', contactSchema);
 module.exports.get = function (callback, limit) {
     Contact.find(callback).limit(limit);
 }
