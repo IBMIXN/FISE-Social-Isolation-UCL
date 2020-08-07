@@ -10,10 +10,10 @@ router.get('/', checkAuthenticated, function (req, res) {
 }); // TO-DO: NEEDS COMPLETION
 
 // MANAGER
-var managerController = require('./controllers/managerController');
+const managerController = require('./controllers/managerController');
 
 // Manager routes
-router.route('/managers') // REMOVE IN FINAL
+router.route('/managers') // TO-DO: REMOVE IN FINAL BUILD
     .get(checkAuthenticated, managerController.index)
     .post(checkAuthenticated, managerController.new);
 router.route('/managers/:manager_id')
@@ -23,7 +23,7 @@ router.route('/managers/:manager_id')
     .delete(checkAuthenticated, managerController.delete);
 
 // USER
-var userController = require('./controllers/userController');
+const userController = require('./controllers/userController');
 // User routes
 router.route('/users')
     .get(checkAuthenticated, userController.index)
@@ -38,19 +38,18 @@ router.route('/users/:user_id')
 
 
 // CONTACT
-var contactController = require('./controllers/contactController');
+const contactController = require('./controllers/contactController');
 // Contact routes
 // TO-DO: assign 'checkAuthenticated' to each route
 router.route('/contacts')
     .get(contactController.index)
-router.route('/contacts/:contact_id')
-    .patch(contactController.update)
-    .put(contactController.update)
 router.route('/contacts/:user_id/:contact_id?')
     .get(contactController.view)
-    .post(contactController.new)
+    .post(contactController.new)    // only needs `user_id`
+    .patch(contactController.update)
+    .put(contactController.update)
     .delete(contactController.delete)
-router.route('/call/:contact_name')
+router.route('/call/:user_id/:contact_id')
     .post(contactController.invite);
 
 

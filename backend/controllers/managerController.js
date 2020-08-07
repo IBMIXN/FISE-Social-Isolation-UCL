@@ -1,7 +1,7 @@
 // managerController.js
-// Import manager model
-Manager = require("../models/managerModel");
 const bcrypt = require("bcryptjs");
+
+Manager = require("../models/managerModel");
 
 // Handle index actions
 exports.index = function (req, res) {
@@ -29,7 +29,7 @@ exports.new = function (req, res) {
             res.render("register.ejs", {email: email.toString()}); // for testing, replace with Adam frontend
         } else {
             let manager = new Manager();
-            manager.email = req.body.email ? req.body.email : manager.email;
+            manager.email = req.body.email;
             manager.password = req.body.password;
             manager.name = req.body.name;
             manager.users = req.body.users;
@@ -70,17 +70,19 @@ exports.view = function (req, res) {
 exports.update = function (req, res) {
     Manager.findById(req.params.manager_id, function (err, manager) {
         if (err) res.send(err);
-        manager.email = req.body.email ? req.body.email : manager.email;
-        manager.password = req.body.password;
-        manager.users = req.body.users;
-        // save the manager and check for errors
-        manager.save(function (err) {
-            if (err) res.json(err);
-            res.json({
-                message: "Manager Info updated",
-                data: manager,
+        else {
+            manager.email = req.body.email ? req.body.email : manager.email;
+            manager.password = req.body.password;
+            manager.users = req.body.users;
+            // save the manager and check for errors
+            manager.save(function (err) {
+                if (err) res.json(err);
+                res.json({
+                    message: "Manager Info updated",
+                    data: manager,
+                });
             });
-        });
+        }
     });
 };
 // Handle delete manager
@@ -89,7 +91,7 @@ exports.delete = function (req, res) {
         {
             _id: req.params.manager_id,
         },
-        function (err, manager) {
+        function (err) {
             if (err) res.send(err);
             res.json({
                 status: "success",

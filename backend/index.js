@@ -12,18 +12,31 @@ app.use(
     })
 );
 
+// DB Connection
+const mongoose = require("mongoose");
+mongoose
+    .connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => console.log("MongoDB Atlas connected successfully"))
+    .catch((err) => console.log(err));
 
 // Session setup
 const session = require("express-session");
+const MongoStore = require('connect-mongo')(session);
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
+        store: new MongoStore({
+            mongooseConnection: mongoose.connection,
+            /*ttl: 12 * 60 * 60*/   // can add how long we want them to be logged in until they have to sign in again
+        })
         // cookie: {secure: true}
     })
 );
-
 
 // Passport setup
 const passport = require("passport");
@@ -40,17 +53,6 @@ function checkAuthenticated(req, res, next) {
     if (!req.isAuthenticated()) return res.redirect("/login");
     next();
 }
-
-
-// DB Connection
-const mongoose = require("mongoose");
-mongoose
-    .connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => console.log("MongoDB Atlas connected successfully"))
-    .catch((err) => console.log(err));
 
 
 // Import routes
@@ -87,7 +89,7 @@ app.route("/login")
 const managerController = require("./controllers/managerController");
 app.route("/register")
     .get(checkNotAuthenticated, function (req, res) {
-        res.render("register.ejs", { email: "" });
+        res.render("register.ejs", {email: ""});
     })
     .post(checkNotAuthenticated, managerController.new);
 
@@ -111,7 +113,7 @@ app.route("/dashboard").get(checkAuthenticated, function (req, res) {
 // }));
 
 // Setup server port
-var port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080;
 
 // Launch app to listen to specified port
 app.listen(port, function () {
