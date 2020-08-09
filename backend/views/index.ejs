@@ -1,48 +1,48 @@
 <%- include("./templates/header.ejs", {title: "Sign In"}) %>
 
 <div
-    class="h-screen pb-14 bg-right bg-cover"
-    style="background-image: url('assets/bg.svg');"
+  class="h-screen pb-14 bg-right bg-cover"
+  style="background-image: url('assets/bg.svg');"
 >
+  <div
+    class="container pt-24 md:pt-48 px-6 mx-auto flex flex-wrap flex-col md:flex-row items-center"
+  >
     <div
-        class="container pt-24 md:pt-48 px-6 mx-auto flex flex-wrap flex-col md:flex-row items-center"
+      class="flex flex-col w-full xl:w-2/5 justify-center lg:items-start overflow-y-hidden"
     >
-        <div
-            class="flex flex-col w-full xl:w-2/5 justify-center lg:items-start overflow-y-hidden"
-        >
-            <h1
-                class="my-4 text-3xl md:text-5xl text-blue-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1"
-            >
-                Finally let your loved ones connect with <i>you</i>.
-            </h1>
-            <p
-                class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle"
-            >
-                FISE Plaza, the easiest way to get in touch with the people you
-                care about!
-            </p>
+      <h1
+        class="my-4 text-3xl md:text-5xl text-blue-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1"
+      >
+        Finally let your loved ones connect with <i>you</i>.
+      </h1>
+      <p
+        class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle"
+      >
+        FISE Plaza, the easiest way to get in touch with the people you care
+        about!
+      </p>
 
-            <p
-                class="text-blue-400 font-bold pb-8 lg:pb-6 text-center md:text-left fade-in"
-            >
-                Get Started Now:
-            </p>
-            <div
-                class="flex w-full justify-center md:justify-start pb-24 lg:pb-0 fade-in"
-            >
-                <a
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    href="/login"
-                    >Sign Up Here</a
-                >
-            </div>
-        </div>
-        <div class="w-full xl:w-3/5 py-6 overflow-y-hidden">
-            <img
-                class="w-5/6 mx-auto lg:mr-0 slide-in-bottom"
-                src="assets/devices.svg"
-            />
-        </div>
+      <p
+        class="text-blue-400 font-bold pb-8 lg:pb-6 text-center md:text-left fade-in"
+      >
+        Get Started Now:
+      </p>
+      <div
+        class="flex w-full justify-center md:justify-start pb-24 lg:pb-0 fade-in"
+      >
+        <a
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          href="/login"
+          >Sign Up Here</a
+        >
+      </div>
     </div>
+    <div class="w-full xl:w-3/5 py-6 overflow-y-hidden">
+      <img
+        class="w-5/6 mx-auto lg:mr-0 slide-in-bottom"
+        src="assets/devices.svg"
+      />
+    </div>
+  </div>
 </div>
 <%- include("./templates/footer.ejs") %>

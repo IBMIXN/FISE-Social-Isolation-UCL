@@ -1,75 +1,72 @@
 <%- include("./templates/header.ejs", {title: "Sign In"}) %>
 <div class="bg-gray-200 flex items-center justify-center h-screen">
-    <div class="w-full max-w-xs">
-        <form
-            class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-            action="/login"
-            method="POST"
+  <div class="w-full max-w-xs">
+    <form
+      class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+      action="/login"
+      method="POST"
+    >
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+          Email Address
+        </label>
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="email"
+          id="email"
+          name="email"
+          placeholder="Email"
+          required
+        />
+      </div>
+      <div class="mb-6">
+        <label
+          class="block text-gray-700 text-sm font-bold mb-2"
+          for="password"
         >
-            <div class="mb-4">
-                <label
-                    class="block text-gray-700 text-sm font-bold mb-2"
-                    for="email"
-                >
-                    Email Address
-                </label>
-                <input
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Email"
-                    required
-                />
-            </div>
-            <div class="mb-6">
-                <label
-                    class="block text-gray-700 text-sm font-bold mb-2"
-                    for="password"
-                >
-                    Password
-                </label>
-                <% if (messages.error) { %>
-                <input
-                    class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="******************"
-                    required
-                />
-                <p class="text-red-500 text-xs italic">
-                    Please enter a password.
-                </p>
-                <% } else { %>
-                <input
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="******************"
-                    required
-                />
-                <% } %>
-            </div>
-            <div class="flex items-center justify-between">
-                <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                    type="submit"
-                >
-                    Sign In
-                </button>
-                <a
-                    class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
-                    href="/register"
-                >
-                    Create an Account
-                </a>
-            </div>
-        </form>
-        <a href="#" class="text-center text-gray-500 text-xs">
-            Forgot Password?
+          Password
+        </label>
+        <% if (messages.error) { %>
+        <input
+          class="shadow appearance-none border border-red-500 rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="******************"
+          required
+        />
+        <p class="text-red-500 text-xs italic">
+          Please enter a password.
+        </p>
+        <% } else { %>
+        <input
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="******************"
+          required
+        />
+        <% } %>
+      </div>
+      <div class="flex items-center justify-between">
+        <button
+          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          type="submit"
+        >
+          Sign In
+        </button>
+        <a
+          class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800"
+          href="/register"
+        >
+          Create an Account
         </a>
-    </div>
+      </div>
+    </form>
+    <a href="#" class="text-center text-gray-500 text-xs">
+      Forgot Password?
+    </a>
+  </div>
 </div>
 <%- include("./templates/footer.ejs") %>
