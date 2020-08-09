@@ -1,4 +1,4 @@
-// managerController.js
+// ** MANAGER ROUTES **
 const bcrypt = require("bcryptjs");
 
 Manager = require("../models/managerModel");
@@ -9,30 +9,34 @@ exports.view = (req, res, next) => {
   res.json({
     message: "Manager details retrieved successfully!",
     data: {
-      email: manager.email,
-      name: manager.name,
       _id: manager._id,
-      Users: manager.Users,
+      firstName: manager.firstName,
+      email: manager.email,
+      users: manager.users,
     },
   });
 };
 
 // Create New Manager
 exports.new = (req, res, next) => {
-  let email = req.body.email;
+  const { email, password, firstName } = req.body;
   Manager.findOne({ email: email }, function (err, manager) {
     if (err) {
       return next(err);
     } else if (manager) {
-      res.render("login.ejs", { email: email.toString() });
+      res.render("login.ejs", {
+        email: email.toString(),
+        messages: { error: "An account with that email already exists!" },
+      });
     } else {
       let manager = new Manager();
-      manager.email = req.body.email;
-      manager.password = req.body.password;
-      manager.name = req.body.name;
-      manager.users = req.body.users;
-      // save the manager and check for errors
+      // TODO: Add Email Validator
+      manager.email = email;
+      manager.password = password;
+      manager.firstName = firstName;
+
       bcrypt.genSalt(10, function (err, salt) {
+        if (err) return next(err);
         bcrypt.hash(manager.password, salt, function (err, hash) {
           if (err) return next(err);
           manager.password = hash;
@@ -48,31 +52,32 @@ exports.new = (req, res, next) => {
 
 // Update Manager's Data
 exports.update = (req, res, next) => {
-  Manager.findById(req.user["_id"], function (err, manager) {
+  const { manager } = req.targets;
+  const { firstName, email, password, confirmPassword } = req.body;
+
+  manager.firstName = firstName ? firstName : manager.firstName;
+  // TODO: Add Email Validator
+  manager.email = email ? email : manager.email;
+  // manager.password = password ? password : manager.password; TODO: Add password validator
+
+  manager.save((err) => {
     if (err) return next(err);
-    manager.email = req.body.email ? req.body.email : manager.email;
-    // manager.password = req.body.password; TODO: FIX THIS (we need to check req.body.confirmPassword then manager.password <- hash(req.body.password))
-    manager.users = req.body.users;
-    // save the manager and check for errors
-    manager.save((err) => {
-      if (err) return next(err);
-      res.json({
-        message: "Manager Info updated",
-        data: manager,
-      });
+    res.status(200).json({
+      message: "Manager Info updated",
+      data: manager,
     });
   });
 };
 
 // Delete Manager
 exports.delete = (req, res, next) => {
-  let manager = req.user;
+  const { manager } = req.targets;
   Manager.deleteMany(
     {
       _id: manager._id,
     },
     function (err) {
-      if (err) next(err);
+      if (err) return next(err);
       res.json({
         status: "success",
         message: "Manager deleted",

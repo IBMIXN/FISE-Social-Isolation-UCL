@@ -100,10 +100,10 @@ app.route("/logout").get(function (req, res) {
 app.route("/dashboard").get(checkAuthenticated, function (req, res) {
   const user = req.user;
   res.render("dashboard.ejs", {
-    name: user.name,
-    managerName: user.name,
+    _id: user._id,
+    firstName: user.firstName,
     email: user.email,
-    users: user.Users,
+    users: user.users,
   });
 });
 // .post(checkNotAuthenticated, passport.authenticate('local', {

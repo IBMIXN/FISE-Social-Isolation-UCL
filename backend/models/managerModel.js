@@ -2,15 +2,13 @@
 const mongoose = require("mongoose");
 const uuid = require("node-uuid");
 
-User = require("./userModel");
-
 // Setup schema
 const managerSchema = mongoose.Schema({
   _id: {
     type: String,
     default: uuid.v4(),
   },
-  name: {
+  firstName: {
     type: String,
     required: true,
   },
@@ -22,9 +20,54 @@ const managerSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  Users: {
-    type: [User.schema],
-  },
+  users: [
+    {
+      _id: {
+        type: String,
+        default: uuid.v4(),
+      },
+      firstName: {
+        type: String,
+        required: true,
+      },
+      otc: {
+        type: String,
+        required: true,
+      },
+      otcIsValid: {
+        type: Boolean,
+        required: true,
+      },
+      imageVideoUrl: {
+        type: [String],
+        required: true,
+      },
+      contacts: [
+        {
+          _id: {
+            type: String,
+            default: uuid.v4(),
+          },
+          firstName: {
+            type: String,
+            required: true,
+          },
+          avatarImage: {
+            type: String,
+            // required: true
+          },
+          email: {
+            type: String,
+            required: true,
+          },
+          relation: {
+            type: Number,
+            required: true,
+          },
+        },
+      ],
+    },
+  ],
 });
 // Export Manager model
 const Manager = (module.exports = mongoose.model("manager", managerSchema));

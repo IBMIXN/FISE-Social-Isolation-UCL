@@ -20,7 +20,7 @@ router
 // /api/users routes
 const userController = require("./controllers/userController");
 
-router.route("/users/otc").get(userController.index); // Get User Data with OTC
+router.route("/users/otc").get(checkOtcIsValid, userController.view); // Get User Data with OTC
 router.route("/users").post(checkAuthenticated, userController.new); // Add User to Manager
 router
   .route("/users/:user_id")
@@ -47,47 +47,78 @@ router
 router
   .route("/contacts/delete/:contact_id")
   .post(checkAuthenticated, checkManagerOwnsContact, contactController.delete); // Delete User's Contact
-router.route("/call/contact/:contact_id").post(contactController.invite); // Call User's Contact
+router
+  .route("/call/contact/:contact_id")
+  .post(checkOtcIsValid, contactController.invite); // Call User's Contact
 
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated() && req.user) {
+    req.targets = {};
+    req.targets.manager = req.user;
     return next();
   }
   res.redirect("/login");
 }
 
-async function checkManagerOwnsUser(req, res, next) {
-  const manager = req.user;
-  const user_id = req.body.user_id ? req.body.user_id : req.params.user_id;
-  const userInUser = await User.findById(user_id);
-  const userInManager = manager.Users.find((usr) => usr._id === user_id);
-  if (userInManager) {
-    req.userInUser = userInUser;
-    req.userInManager = userInManager;
+async function checkOtcIsValid(req, res, next) {
+  const { otc } = req.body;
+
+  const all_managers = await Manager.find({});
+  const manager = all_managers.filter((manager) =>
+    manager.users.filter((user) => user.otc === otc)
+  )[0];
+  const user = manager.users.filter((user) => user.otc === otc)[0];
+
+  if (manager && user && user.otcIsValid) {
+    req.targets = { manager, user };
     return next();
   }
+
+  res.status(403).send({
+    message:
+      "Either you don't have access to that app user or it doesn't exist!",
+  });
+}
+
+async function checkManagerOwnsUser(req, res, next) {
+  const { manager } = req.targets;
+  const user_id = req.body.user_id ? req.body.user_id : req.params.user_id;
+
+  const user = manager.users.filter((user) => user._id === user_id)[0];
+
+  if (user) {
+    req.targets.user = user;
+    return next();
+  }
+
   res.status(403).send({
     message: "Either you don't have access to that user or it doesn't exist!",
   });
 }
 
 async function checkManagerOwnsContact(req, res, next) {
-  let manager = req.user;
-  let contact_id = req.body.contact_id
+  const { manager } = req.targets;
+  const contact_id = req.body.contact_id
     ? req.body.contact_id
     : req.params.contact_id;
 
-  const userInManager = manager.Users.find((usr) =>
-    usr.Contacts.find((contact) => contact._id === contact_id)
-  );
-  const user = await User.findById(userInManager._id);
-  req.params.user_id = userInManager._id;
+  const user = manager.users.filter((user) =>
+    user.contacts.filter((contact) => contact._id === contact_id)
+  )[0];
 
-  if (userInManager) {
+  const contact = user.contacts.filter(
+    (contact) => contact._id == contact_id
+  )[0];
+
+  if (manager && user && contact) {
+    req.targets.user = user;
+    req.targets.contact = contact;
     return next();
   }
+
   res.status(403).send({
-    message: "You don't have access to that contact!",
+    message:
+      "Either you don't have access to that contact or it doesn't exist!",
   });
 }
 
