@@ -12,11 +12,12 @@ exports.view = (req, res, next) => {
 // Add User to Manager
 exports.new = (req, res, next) => {
   let { manager } = req.targets;
+  const { firstName, imageVideoUrl, otc } = req.body;
 
   const newUser = {
-    firstName: "AdamUser",
-    imageVideoUrl: "https://google.com",
-    otc: "thisismylongotc",
+    firstName,
+    imageVideoUrl,
+    otc,
     otcIsValid: true,
   };
 
