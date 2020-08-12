@@ -6,35 +6,35 @@ const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(
-    bodyParser.urlencoded({
-        extended: true,
-    })
+  bodyParser.urlencoded({
+    extended: true,
+  })
 );
 
 // DB Connection
 const mongoose = require("mongoose");
 mongoose
-    .connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => console.log("MongoDB Atlas connected successfully"))
-    .catch((err) => console.log(err));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("MongoDB Atlas connected successfully"))
+  .catch((err) => console.log(err));
 
 // Session setup
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        store: new MongoStore({
-            mongooseConnection: mongoose.connection,
-            /*ttl: 12 * 60 * 60*/ // can add how long we want them to be logged in until they have to sign in again
-        }),
-        cookie: {secure: process.env.ENVIRONMENT !== "DEVELOPMENT"},
-    })
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: new MongoStore({
+      mongooseConnection: mongoose.connection,
+      /*ttl: 12 * 60 * 60*/ // can add how long we want them to be logged in until they have to sign in again
+    }),
+    cookie: { secure: process.env.ENVIRONMENT !== "DEVELOPMENT" },
+  })
 );
 
 // Passport setup
@@ -44,13 +44,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 function checkNotAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) return res.redirect("/dashboard");
-    next();
+  if (req.isAuthenticated()) return res.redirect("/dashboard");
+  next();
 }
 
 function checkAuthenticated(req, res, next) {
-    if (!req.isAuthenticated()) return res.redirect("/login");
-    next();
+  if (!req.isAuthenticated()) return res.redirect("/login");
+  next();
 }
 
 // Import routes
@@ -67,94 +67,84 @@ app.use(express.static("public"));
 
 // ---------------- Define Views ------------------
 app.get("/", (req, res) => {
-    res.render("index.ejs");
+  res.render("index.ejs");
 });
 
 app
-    .route("/login")
-    .get(checkNotAuthenticated, function (req, res) {
-        res.render("login.ejs");
+  .route("/login")
+  .get(checkNotAuthenticated, function (req, res) {
+    res.render("login.ejs");
+  })
+  .post(
+    checkNotAuthenticated,
+    passport.authenticate("local", {
+      successRedirect: "/dashboard",
+      failureRedirect: "/register",
+      failureFlash: true,
     })
-    .post(
-        checkNotAuthenticated,
-        passport.authenticate("local", {
-            successRedirect: "/dashboard",
-            failureRedirect: "/register",
-            failureFlash: true,
-        })
-    );
+  );
 
 const managerController = require("./controllers/managerController");
 app
-    .route("/register")
-    .get(checkNotAuthenticated, function (req, res) {
-        res.render("register.ejs", {email: ""});
-    })
-    .post(checkNotAuthenticated, managerController.new);
+  .route("/register")
+  .get(checkNotAuthenticated, function (req, res) {
+    res.render("register.ejs", { email: "" });
+  })
+  .post(checkNotAuthenticated, managerController.new);
 
 app.route("/logout").get(function (req, res) {
-    req.logout();
-    res.redirect("/");
+  req.logout();
+  res.redirect("/");
 });
 
-app.route("/dashboard")
-    .get(checkAuthenticated, function (req, res) {
-        const user = req.user;
-        res.render("dashboard.ejs", {
-            _id: user._id,
-            firstName: user.firstName,
-            email: user.email,
-            users: user.users,
-        });
+app.route("/dashboard").get(checkAuthenticated, function (req, res) {
+  const user = req.user;
+  res.render("dashboard.ejs", {
+    _id: user._id,
+    firstName: user.firstName,
+    email: user.email,
+    users: user.users,
+  });
+});
+
+app.route("/dashboard/:user_id").get(checkAuthenticated, function (req, res) {
+  const user = req.user.users.find((usr) => usr._id === req.params.user_id);
+  res.render("user.ejs", {
+    user
+  });
+});
+
+app
+  .route("/dashboard/manager/user/new")
+  .get(checkAuthenticated, function (req, res) {
+    const manager = req.user;
+    res.render("newUser.ejs", {
+      manager
     });
+  });
 
-app.route("/dashboard/:user_id")
-    .get(checkAuthenticated, function (req, res) {
-        const user = req.user.users.find(usr => usr._id === req.params.user_id);
-        res.render("user.ejs", {
-            _id: user._id,
-            firstName: user.firstName,
-            imageVideoUrl: user.imageVideoUrl,
-            contacts: user.contacts,
-        });
+app
+  .route("/dashboard/:user_id/:contact_id")
+  .get(checkAuthenticated, function (req, res) {
+    const user = req.user.users.find((usr) => usr._id === req.params.user_id);
+    const contact = user.contacts.find(
+      (cont) => cont._id === req.params.contact_id
+    );
+    res.render("contact.ejs", {
+      user,
+      contact,
     });
+  });
 
-app.route("/dashboard/:user_id/:contact_id")
-    .get(checkAuthenticated, function (req, res) {
-        const user = req.user.users.find(usr => usr._id === req.params.user_id);
-        const contact = user.contacts.find(cont => cont._id === req.params.contact_id);
+app
+  .route("/dashboard/manager/:user_id/contact/new")
+  .get(checkAuthenticated, function (req, res) {
+    const user = req.user.users.find((usr) => usr._id === req.params.user_id);
 
-        res.render("contact.ejs", {
-            _id: contact._id,
-            firstName: contact.firstName,
-            avatarImage: contact.avatarImage,
-            email: contact.email,
-            relation: getKeyByValue(contact.relation),
-        });
+    res.render("newContact.ejs", {
+      user
     });
-
-app.route("/dashboard/manager/:user_id/contact/new")
-    .get(checkAuthenticated, function (req, res) {
-        const user = req.user.users.find(usr => usr._id === req.params.user_id);
-
-        res.render("newContact.ejs", {
-            _id: user._id,
-            firstName: user.firstName,
-            imageVideoUrl: user.imageVideoUrl,
-            contacts: user.contacts,
-        });
-    });
-
-app.route("/dashboard/manager/user/new")
-    .get(checkAuthenticated, function (req, res) {
-        const manager = req.user;
-        res.render("newUser.ejs", {
-            _id: manager._id,
-            firstName: manager.firstName,
-            email: manager.email,
-            users: manager.users,
-        });
-    });
+  });
 
 // .post(checkNotAuthenticated, passport.authenticate('local', {
 //     successRedirect: '/dashboard',
@@ -167,24 +157,25 @@ const port = process.env.PORT || 8080;
 
 // Launch app to listen to specified port
 app.listen(port, function () {
-    console.log("Running FISE on port " + port);
+  console.log("Running FISE on port " + port);
 });
 
-
 function getKeyByValue(value) {
-    const relationMappings = {
-        mother: 0,
-        father: 1,
-        grandmother: 2,
-        grandfather: 3,
-        aunt: 4,
-        uncle: 5,
-        sister: 6,
-        brother: 7,
-        daughter: 8,
-        son: 9,
-        granddaughter: 10,
-        grandson: 11,
-    };
-    return Object.keys(relationMappings).find(key => relationMappings[key] === value);
+  const relationMappings = {
+    mother: 0,
+    father: 1,
+    grandmother: 2,
+    grandfather: 3,
+    aunt: 4,
+    uncle: 5,
+    sister: 6,
+    brother: 7,
+    daughter: 8,
+    son: 9,
+    granddaughter: 10,
+    grandson: 11,
+  };
+  return Object.keys(relationMappings).find(
+    (key) => relationMappings[key] === value
+  );
 }

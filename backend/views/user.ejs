@@ -1,166 +1,196 @@
-<%- include("./templates/header.ejs", {title: "Dashboard"}) %>
+<%- include("./templates/header.ejs", {title: "Dashboard"}) %> <% const
+relationMappings = [ "mother", "father", "grandmother", "grandfather", "aunt",
+"uncle", "sister", "brother", "daughter", "son", "granddaughter", "grandson", ];
+function capitalizeFirstLetter(string) { return string.charAt(0).toUpperCase() +
+string.slice(1); } %>
+<div id="content" class="m-6 flex-1">
+  <div class="w-full md:w-1/3 my-6 md:my-1">
+    <ol class="list-reset flex text-grey-dark">
+      <li><a href="/dashboard" class="underline">Dashboard</a></li>
+      <li><span class="mx-2">/</span></li>
+      <li class="font-bold"><%= user.firstName %></li>
+    </ol>
+  </div>
 
-<div class="m-6">
-    <h1
-            class="my-4 text-3xl md:text-5xl text-blue-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1"
-    >
-        Editing <%= firstName %>'s profile!
-    </h1>
+  <h1
+    class="my-4 text-3xl md:text-5xl text-blue-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1"
+  >
+    Editing <%= user.firstName %>'s profile!
+  </h1>
 
-    <div class="w-full md:w-1/3 my-6 md:my-1">
-        <a
-                class="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline bg-transparent"
-                href="/logout"
+  <form
+    id="updateUser"
+    class="w-full max-w-3"
+    action="/api/users/update/<%= user._id %>"
+    method="post"
+  >
+    <div class="flex flex-wrap -mx-3 mb-6 m-6">
+      <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="firstName"
         >
-            Log Out
-        </a>
+          Your First Name
+        </label>
+        <input
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          id="firstName"
+          name="firstName"
+          type="text"
+          value="<%= user.firstName %>"
+        />
+      </div>
     </div>
 
-    <form class="w-full max-w-3" action="/api/users/update/<%= _id %>" method="post">
-        <div class="flex flex-wrap -mx-3 mb-6 m-6">
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label
-                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                        for="firstName"
-                >
-                    Your First Name
-                </label>
-                <input
-                        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="firstName"
-                        name="firstName"
-                        type="text"
-                        value="<%= firstName %>"
-                />
-            </div>
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label
-                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                        for="imageVideoUrl"
-                >
-                    Your Image/Video URL
-                </label>
+    <div class="flex flex-wrap -mx-3 mb-6 m-6">
+      <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="imageVideoUrl"
+        >
+          Your AR Media URLs (Deselect to remove)
+        </label>
 
-                <div class=" relative">
-                    <select
-                            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                            id="imageVideoUrl"
-                            name="imageVideoUrl"
-                    >
-                        <% for(var i = 0; i < imageVideoUrl.length; i++) { %>
-                            <option><%= imageVideoUrl[i] %></option>
-                        <% } %>
-                        <input
-                                class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded
-            py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                id="imageVideoUrl"
-                                name="imageVideoUrl"
-                                type="text"
-                                value=""
-                        />
-                    </select>
-                    <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-                    >
-                        <svg
-                                class="fill-current h-4 w-4"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                        >
-                            <path
-                                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+        <div class="relative">
+          <select
+            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            id="imageVideoUrl"
+            name="imageVideoUrl"
+            multiple="multiple"
+          >
+            <% for(var i = 0; i < user.imageVideoUrl.length; i++) { %>
+            <option selected><%= user.imageVideoUrl[i] %></option>
+            <% } %>
+          </select>
+          <!-- <div
+          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+        >
+          <svg
+            class="fill-current h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+            />
+          </svg>
+        </div> -->
         </div>
-        <div class="flex flex-wrap -mx-3 mb-6">
-
-            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-                <label
-                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                        for="grid-state"
-                >
-                    Background Image
-                </label>
-                <div class="relative">
-                    <select
-                            class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                            id="backgroundImage"
-                    >
-                        <option>Park</option>
-                        <option>Beach</option>
-                        <option>Underwater</option>
-                    </select>
-                    <div
-                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-                    >
-                        <svg
-                                class="fill-current h-4 w-4"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                        >
-                            <path
-                                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                            />
-                        </svg>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="imageVideoUrl"
+        >
+          Add new AR Media URL
+        </label>
+        <input
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          id="imageVideoUrl"
+          name="imageVideoUrl"
+          type="text"
+          value=""
+        />
+      </div>
+    </div>
+    <!-- <div class="flex flex-wrap -mx-3 mb-6">
+    <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+      <label
+        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+        for="grid-state"
+      >
+        Background Image
+      </label>
+      <div class="relative">
+        <select
+          class="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          id="backgroundImage"
+        >
+          <option>Park</option>
+          <option>Beach</option>
+          <option>Underwater</option>
+        </select>
+        <div
+          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
+        >
+          <svg
+            class="fill-current h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
+            />
+          </svg>
         </div>
-        <div class="w-full md:w-1/3 my-6 md:my-1">
-            <button
-                    class=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
-
-            >
-                Update Info
-            </button>
-        </div>
-
-    </form>
-
-    <h2
-            class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle"
-    >
-        Contacts
-    </h2>
-    <table class="table-fixed">
-        <thead>
-        <tr>
-            <th class="w-1/2 px-4 py-2">Name</th>
-            <th class="w-1/4 px-4 py-2">Email</th>
-            <th class="w-1/4 px-4 py-2">Relation</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% for(var i = 0; i < contacts.length; i++) { %>
-            <tr>
-                <td class="border px-4 py-2"><%= contacts[i].firstName %></td>
-                <td class="border px-4 py-2"><%= contacts[i].email %></td>
-                <td class="border px-4 py-2"><%= contacts[i].relation %></td>
-                <td class="border px-4 py-2"><a href="/dashboard/<%= _id %>/<%= contacts[i]._id %>">Edit</a></td>
-                <td class="border px-4 py-2">
-                    <form action="/api/contacts/delete/<%= contacts[i]._id %>" method="post">
-                        <div class="w-full md:w-1/3 my-6 md:my-1">
-                            <button
-                                    class=" bg-red-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
-                            >
-                                DELETE
-                            </button>
-                        </div>
-                    </form>
-                </td>
-            </tr>
-        <% } %>
-        </tbody>
-    </table>
+      </div>
+    </div>
+  </div> -->
     <div class="w-full md:w-1/3 my-6 md:my-1">
-        <button
-                class=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
-        ><a href="/dashboard/manager/<%= _id %>/contact/new">+ Add a new Contact</a>
-        </button>
+      <button
+        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Update Info
+      </button>
     </div>
-</div>
+  </form>
 
-<%- include("./templates/footer.ejs") %>
+  <h2
+    class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle pt-20"
+  >
+    Contacts
+  </h2>
+  <table class="table-fixed">
+    <thead>
+      <tr>
+        <th class="w-1/2 px-4 py-2">Name</th>
+        <th class="w-1/4 px-4 py-2">Email</th>
+        <th class="w-1/4 px-4 py-2">Relation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(var i = 0; i < user.contacts.length; i++) { %>
+      <tr>
+        <td class="border px-4 py-2"><%= user.contacts[i].firstName %></td>
+        <td class="border px-4 py-2"><%= user.contacts[i].email %></td>
+        <td class="border px-4 py-2">
+          <%= capitalizeFirstLetter(relationMappings[user.contacts[i].relation])
+          %>
+        </td>
+        <td class="border px-4 py-2">
+          <a
+            href="/dashboard/<%= user._id %>/<%= user.contacts[i]._id %>"
+            class="text-blue-600 underline font-bold"
+            >Edit</a
+          >
+        </td>
+        <td class="border px-4 py-2">
+          <form
+            id="deleteContact"
+            action="/api/contacts/delete/<%= user.contacts[i]._id %>"
+            method="post"
+          >
+            <div class="w-full md:w-1/3 my-6 md:my-1">
+              <button
+                class="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline bg-transparent"
+              >
+                DELETE
+              </button>
+            </div>
+          </form>
+        </td>
+      </tr>
+      <% } %>
+    </tbody>
+  </table>
+  <div class="w-full md:w-1/3 my-6 md:my-1 py-2">
+    <a
+      href="/dashboard/manager/<%= user._id %>/contact/new"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+    >
+      + Add a new Contact
+    </a>
+  </div>
+
+  <%- include("./templates/footer.ejs") %>
+</div>
