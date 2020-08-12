@@ -2,15 +2,15 @@
 
 <div class="m-6">
     <h1
-        class="my-4 text-3xl md:text-5xl text-blue-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1"
+            class="my-4 text-3xl md:text-5xl text-blue-800 font-bold leading-tight text-center md:text-left slide-in-bottom-h1"
     >
         Hello there <%= firstName %>!
     </h1>
 
     <div class="w-full md:w-1/3 my-6 md:my-1">
         <a
-            class="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline bg-transparent"
-            href="/logout"
+                class="border border-red-600 text-red-600 hover:bg-red-600 hover:text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline bg-transparent"
+                href="/logout"
         >
             Log Out
         </a>
@@ -20,84 +20,124 @@
         <div class="flex flex-wrap -mx-3 mb-6 m-6">
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <label
-                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                    for="grid-last-name"
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                        for="grid-last-name"
                 >
                     Your First Name
                 </label>
                 <input
-                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    value="<%= firstName %>"
+                        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        value="<%= firstName %>"
                 />
             </div>
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <label
-                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                    for="grid-last-name"
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                        for="grid-last-name"
                 >
                     Your Email Address
                 </label>
                 <input
-                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id="email"
-                    name="email"
-                    type="text"
-                    value="<%= email %>"
+                        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="email"
+                        name="email"
+                        type="text"
+                        value="<%= email %>"
                 />
             </div>
         </div>
         <div class="flex flex-wrap -mx-3 mb-6 m-6">
             <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
                 <label
-                    class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-                    for="grid-last-name"
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                        for="grid-last-name"
                 >
                     Your Password (Required to make changes)
                 </label>
                 <input
-                    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="********"
+                        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="password"
+                        name="password"
+                        type="password"
+                        placeholder="********"
+                />
+            </div>
+            <div class="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+                <label
+                        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+                        for="grid-last-name"
+                >
+                    Confirm Password
+                </label>
+                <input
+                        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="********"
                 />
             </div>
         </div>
         <div class="w-full md:w-1/3 my-6 md:my-1">
             <button
-                class=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
+                    class=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
             >
                 Save Changes
             </button>
         </div>
-        
+    </form>
+    <form action="/api/managers/delete" method="post">
+        <div class="w-full md:w-1/3 my-6 md:my-1">
+            <button
+                    class=" bg-red-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
+            >
+                DELETE Manager
+            </button>
+        </div>
     </form>
     <h2
             class="leading-normal text-base md:text-2xl mb-8 text-center md:text-left slide-in-bottom-subtitle"
-        >
-            Users Managed by You
-        </h2>
-        <table class="table-fixed">
-            <thead>
-              <tr>
-                <th class="w-1/2 px-4 py-2">Name</th>
-                <th class="w-1/4 px-4 py-2">Login Code</th>
-                <th class="w-1/4 px-4 py-2">Views</th>
-              </tr>
-            </thead>
-            <tbody>
-                <% for(var i=0; i<users.length; i++) {%>
-                    <tr>
-                        <td class="border px-4 py-2"><%= users[i].firstName %></td>
-                        <td class="border px-4 py-2"><%= users[i].otc %></td>
-                        <td class="border px-4 py-2"><a href="/api/user/<%= users[i].id %>">Edit</a></td>
-                    </tr>
-                 <% } %>
-            </tbody>
-          </table>
+    >
+        Users Managed by You
+    </h2>
+    <table class="table-fixed">
+        <thead>
+        <tr>
+            <th class="w-1/2 px-4 py-2">Name</th>
+            <th class="w-1/4 px-4 py-2">Login Code</th>
+            <th class="w-1/4 px-4 py-2">Views</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% for(var i = 0; i < users.length; i++) { %>
+            <tr>
+                <td class="border px-4 py-2"><%= users[i].firstName %></td>
+                <td class="border px-4 py-2"><%= users[i].otc %></td>
+                <td class="border px-4 py-2"><a href="/dashboard/<%= users[i]._id %>">Edit</a></td>
+                <td class="border px-4 py-2">
+                    <form action="/api/users/delete/<%= users[i]._id %>" method="post">
+                        <div class="w-full md:w-1/3 my-6 md:my-1">
+                            <button
+                                    class=" bg-red-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
+                            >
+                                DELETE
+                            </button>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        <% } %>
+        </tbody>
+    </table>
+    <div class="w-full md:w-1/3 my-6 md:my-1">
+        <button
+                class=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline "
+        ><a href="/dashboard/manager/user/new">+ Add a new User</a>
+        </button>
+    </div>
 </div>
 
 <%- include("./templates/footer.ejs") %>
