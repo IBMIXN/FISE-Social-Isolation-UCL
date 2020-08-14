@@ -84,4 +84,12 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/react,macos,windows,visualstudiocode
-backend/report.20200729.180956.51551.0.001.json
+
+debug/
+.idea/
+.env
+.next/
+public/stylesheets/style.css
+env_vars.yaml
+node_modules/
+report.*.json

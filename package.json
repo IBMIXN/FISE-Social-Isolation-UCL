@@ -6,7 +6,7 @@
   "scripts": {
     "build:css": "postcss public/stylesheets/tailwind.css -o public/stylesheets/style.css",
     "gcp-build": "npm i",
-    "start": "node index.js",
+    "start": "npm run build:css && node index.js",
     "dev": "source .env && npm run build:css && nodemon index.js"
   },
   "author": "Emil Almazov",
@@ -22,15 +22,13 @@
     "mongoose": "^5.9.26",
     "mongoose-uuid2": "^2.3.0",
     "node-uuid": "^1.4.8",
-    "nodemailer": "^6.4.10",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "random-words": "^1.1.1",
     "tailwindcss": "^1.5.2",
-    "uuid": "^8.3.0"
-  },
-  "devDependencies": {
+    "uuid": "^8.3.0",
     "connect-mongo": "^3.2.0",
     "postcss-cli": "^7.1.1"
-  }
+  },
+  "devDependencies": {}
 }
