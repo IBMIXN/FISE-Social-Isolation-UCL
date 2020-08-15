@@ -1,17 +1,3 @@
-import styles from './footer.module.css'
+import { Flex } from '@chakra-ui/core'
 
-const Footer = () => (
-  <div className={styles.footer}>
-    <hr />
-    <ul className={styles.navigation}>
-      <li className={styles.navigationItem}>
-        <a href="https://github.com/iaincollins/next-auth-example">Source</a>
-      </li>
-      <li className={styles.navigationItem}>
-        <a href="https://next-auth.js.org">Documentation</a>
-      </li>
-    </ul>
-  </div>
-)
-
-export default Footer
+export const Footer = (props) => <Flex as="footer" py="8rem" {...props} />

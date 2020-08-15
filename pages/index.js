@@ -1,37 +1,95 @@
 import { useSession } from "next-auth/client";
-import Nav from "../components/nav";
-import Footer from "../components/footer";
+// import Footer from "../components/footer";
+import {
+  Link as ChakraLink,
+  Text,
+  Code,
+  Icon,
+  Heading,
+  List,
+  ListIcon,
+  ListItem,
+  Flex,
+} from "@chakra-ui/core";
 
-const NextAuth = () => {
+import { Nav } from "../components/Nav";
+import { Hero } from "../components/Hero";
+import { Container } from "../components/Container";
+import { Main } from "../components/Main";
+import { DarkModeSwitch } from "../components/DarkModeSwitch";
+import { CTA } from "../components/CTA";
+import { Footer } from "../components/Footer.js";
+
+const IndexPage = () => {
   const [session, loading] = useSession();
-  console.log(session);
   return (
-    <>
+    <Container>
       <Nav />
-      <main>
-        <h1>NextAuth.js Demo</h1>
-        <p>
-          This is an example project that uses{" "}
-          <a href={`https://www.npmjs.com/package/next-auth`}>next-auth</a>.
-        </p>
-        <p>
-          See <a href="https://next-auth.js.org">next-auth.js.org</a> for more
-          information and documentation. A more full fledged example can be
-          found at{" "}
-          <a href="https://next-auth-example.now.sh">
-            next-auth-example.now.sh
+      <Hero />
+      <Main mt="-30vh">
+        <Heading>
+          Let your loved ones connect with <strong>you</strong>, not the other
+          way around.
+        </Heading>
+
+        <List spacing={3} my={0}>
+          <ListItem>
+            <ListIcon icon="check-circle" color="green.500" />
+            Intuitive User Interface
+          </ListItem>
+          <ListItem>
+            <ListIcon icon="check-circle" color="green.500" />
+            Secure
+          </ListItem>
+          <ListItem>
+            <ListIcon icon="check-circle" color="green.500" />
+            Free
+          </ListItem>
+        </List>
+      </Main>
+
+      {/* <DarkModeSwitch /> */}
+      <Footer as={Flex} direction="column" justify="center" align="center">
+        <Flex align="center" justify="space-between" wrap="wrap" padding="1rem">
+          <Text textAlign="center">
+            by Adam Peace, Emil Almazov, Rikaz Rameez <br />
+            In association with IBM & University College London
+          </Text>
+        </Flex>
+
+        <Flex
+          align="center"
+          justify="space-between"
+          wrap="wrap"
+          padding="1rem"
+          w="60vw"
+          maxW="60rem"
+        >
+          <a href="https://ibm.com">
+            <Icon
+              name="ibm"
+              color="grey.600"
+              // color="blue.600"
+              w="200px"
+              h="50px"
+              m="1rem"
+            />
           </a>
-        </p>
-        <p>
-          This live demo uses an in-memory database which is automatically
-          erased after ~2 hours. More permanent user databases, etc. can be
-          easily created by defining a db connector your .env file, see{" "}
-          <a href="https://next-auth.js.org/configuration/database">docs</a>
-        </p>
-      </main>
-      <Footer />
-    </>
+          <a href="https://ucl.ac.uk">
+            <Icon
+              name="ucl"
+              color="grey.600"
+              // color="blue.600"
+              w="200px"
+              h="50px"
+              m="1rem"
+            />
+          </a>
+        </Flex>
+      </Footer>
+      {!loading && !session && <CTA />}
+    </Container>
   );
 };
 
-export default NextAuth;
+export default IndexPage;

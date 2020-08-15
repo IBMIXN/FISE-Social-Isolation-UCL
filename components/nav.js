@@ -1,61 +1,86 @@
-import { signin, signout, useSession } from 'next-auth/client'
-import styles from './nav.module.css'
+import { useState } from "react";
+import NextLink from "next/link"
+import { signin, signout, useSession } from "next-auth/client";
+import { Box, Heading, Flex, Text, Button } from "@chakra-ui/core";
 
-/**
- * The approach used in this component shows how to built a sign in and sign out
- * component that works on pages which support both client and server side
- * rendering, and avoids any flash incorrect content on initial page load.
- **/
-const Nav = () => {
-  const [session, loading] = useSession()
+const MenuItems = ({ children }) => (
+  <Text mt={{ base: 4, md: 0 }} mr={6} display="block">
+    {children}
+  </Text>
+);
+
+export const Nav = ({ props }) => {
+  const [session, loading] = useSession();
+
+  const [show, setShow] = useState(true);
+  const handleToggle = () => setShow(!show);
 
   return (
-    <nav>
-      <noscript>
-        <style>{`.nojs-show { opacity: 1; top: 0; }`}</style>
-      </noscript>
-      <p
-        className={`nojs-show ${
-          !session && loading ? styles.loading : styles.loaded
-        }`}
-      >
-        {!session && (
-          <>
-            <span className={styles.notSignedIn}>Not signed in</span>
-            <a
-              href={`/api/auth/signin`}
-              onClick={(e) => {
-                e.preventDefault()
-                signin()
-              }}
-            >
-              <button className={styles.signinButton}>Sign in</button>
-            </a>
-          </>
-        )}
-        {session && (
-          <>
-            <span
-              style={{ backgroundImage: `url(${session.user.image})` }}
-              className={styles.avatar}
-            />
-            <span className={styles.signedIn}>
-              Signed in as <strong>{session.user.email}</strong>
-            </span>
-            <a
-              href={`/api/auth/signout`}
-              onClick={(e) => {
-                e.preventDefault()
-                signout()
-              }}
-            >
-              <button className={styles.signoutButton}>Sign out</button>
-            </a>
-          </>
-        )}
-      </p>
-    </nav>
-  )
-}
+    <Flex
+      as="nav"
+      align="center"
+      justify="space-between"
+      wrap="wrap"
+      padding="1rem"
+      px="1.5rem"
+      // bg="blue.500"
+      color="white"
+      w={["100%", "100%", 3 / 4]}
+      {...props}
+    >
+      <Flex as="a" href="/" align="center" mr={5}>
+        <Heading as="h1" size="lg" letterSpacing={"-.1rem"}>
+          FISE Lounge
+        </Heading>
+      </Flex>
 
-export default Nav
+      {/* <Box display={["block", "none"]} onClick={handleToggle}>
+        <svg
+          fill="white"
+          width="12px"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <title>Menu</title>
+          <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+        </svg>
+      </Box> */}
+
+      {/* <Box
+        display={[show ? "block" : "none", "flex"]}
+        width={["full", "auto"]}
+        alignItems="center"
+        flexGrow={1}
+      >
+        <MenuItems>Get S</MenuItems>
+        <MenuItems>Examples</MenuItems>
+        <MenuItems>Blog</MenuItems>
+      </Box> */}
+
+      <Box 
+      // display={[show ? "block" : "none", "block"]} 
+      mt={{ base: 4, md: 0 }}>
+        {!session && (
+          <Button
+            as="a"
+            href="/api/auth/signin"
+            onClick={(e) => {
+              e.preventDefault();
+              signin();
+            }}
+            bg="transparent"
+            border="1px"
+          >
+            Get Started
+          </Button>
+        )}
+
+        {session && (
+          <Button as="a" href="/dashboard" bg="transparent" border="1px">
+            View Dashboard
+          </Button>
+        )}
+      </Box>
+    </Flex>
+  );
+};
