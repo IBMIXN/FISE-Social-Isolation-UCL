@@ -1,15 +1,10 @@
 import { useSession } from "next-auth/client";
 // import Footer from "../components/footer";
 import {
-  Link as ChakraLink,
-  Text,
-  Code,
-  Icon,
   Heading,
   List,
   ListIcon,
   ListItem,
-  Flex,
 } from "@chakra-ui/core";
 
 import { Nav } from "../components/Nav";
@@ -49,44 +44,7 @@ const IndexPage = () => {
       </Main>
 
       {/* <DarkModeSwitch /> */}
-      <Footer as={Flex} direction="column" justify="center" align="center">
-        <Flex align="center" justify="space-between" wrap="wrap" padding="1rem">
-          <Text textAlign="center">
-            by Adam Peace, Emil Almazov, Rikaz Rameez <br />
-            In association with IBM & University College London
-          </Text>
-        </Flex>
-
-        <Flex
-          align="center"
-          justify="space-between"
-          wrap="wrap"
-          padding="1rem"
-          w="60vw"
-          maxW="60rem"
-        >
-          <a href="https://ibm.com">
-            <Icon
-              name="ibm"
-              color="grey.600"
-              // color="blue.600"
-              w="200px"
-              h="50px"
-              m="1rem"
-            />
-          </a>
-          <a href="https://ucl.ac.uk">
-            <Icon
-              name="ucl"
-              color="grey.600"
-              // color="blue.600"
-              w="200px"
-              h="50px"
-              m="1rem"
-            />
-          </a>
-        </Flex>
-      </Footer>
+      <Footer />
       {!loading && !session && <CTA />}
     </Container>
   );

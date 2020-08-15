@@ -1,5 +1,5 @@
-import NextAuth from 'next-auth'
-import Providers from 'next-auth/providers'
+import NextAuth from "next-auth";
+import Providers from "next-auth/providers";
 
 const options = {
   site: process.env.VERCEL_URL,
@@ -36,7 +36,10 @@ const options = {
   // * You need to install an appropriate node_module for your database!
   // * The email sign in provider requires a database but OAuth providers do not
   database: process.env.DATABASE_URL,
-
+  // database: {
+  //   url: process.env.MONGODB_URI,
+  //   database: process.env.MONGODB_DB,
+  // },
   session: {
     // Use JSON Web Tokens for session instead of database sessions.
     // This option can be used with or without a database for users/accounts.
@@ -82,7 +85,7 @@ const options = {
   allowSignin: async (user, account) => {
     // Return true if user / account is allowed to sign in.
     // Return false to display an access denied message.
-    return true
+    return true;
   },
 
   // You can define custom pages to override the built-in pages
@@ -92,14 +95,14 @@ const options = {
     // signout: '/api/auth/signout', // Displays form with sign out button
     // error: '/api/auth/error', // Error code passed in query string as ?error=
     // verifyRequest: '/api/auth/verify-request', // Used for check email page
-    // newUser: null // If set, new users will be directed here on first sign in
+    newUser: "/onboarding", // If set, new users will be directed here on first sign in
   },
 
   // Additional options
   // secret: 'abcdef123456789' // Recommended (but auto-generated if not specified)
   // debug: true, // Use this option to enable debug messages in the console
-}
+};
 
-const Auth = (req, res) => NextAuth(req, res, options)
+const Auth = (req, res) => NextAuth(req, res, options);
 
-export default Auth
+export default Auth;
