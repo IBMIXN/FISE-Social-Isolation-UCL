@@ -3,9 +3,7 @@ import { useRouter } from "next/router";
 import { Formik, Field } from "formik";
 import {
   Text,
-  Icon,
   Heading,
-  Stack,
   FormErrorMessage,
   FormLabel,
   FormControl,
@@ -13,8 +11,8 @@ import {
   Button,
 } from "@chakra-ui/core";
 
-import { Nav } from "../components/Nav";
 import { Container } from "../components/Container";
+import { Nav } from "../components/Nav";
 import { Main } from "../components/Main";
 import { Footer } from "../components/Footer.js";
 import Loading from "../components/Loading";
@@ -66,7 +64,7 @@ const NameForm = ({ router }) => {
         }
         throw await err.json().then((rJson) => {
           setError("name", {
-            message: `HTTP ${err.status} ${err.statusText}: ${rJson.msg}`,
+            message: `HTTP ${err.status} ${err.statusText}: ${rJson.message}`,
           });
           return;
         });
@@ -112,13 +110,8 @@ const OnboardingPage = () => {
   const [session, loading] = useSession();
   const router = useRouter();
 
-  if (!session && !loading) {
-    router.replace("/");
-    return <p>Not authed, sorry</p>;
-  } else {
-    if (!session) {
-      return <Loading />;
-    } else if (session.user && session.user.name) {
+  if (session) {
+    if (session.user.name) {
       router.replace("/dashboard");
       return <Loading />;
     } else {
@@ -132,13 +125,14 @@ const OnboardingPage = () => {
             </Text>
             <NameForm router={router} />
           </Main>
-
-          {/* <DarkModeSwitch /> */}
           <Footer />
         </Container>
       );
     }
-  }
+  } else if (!loading && !session) {
+    router.replace("/");
+    return <p>Unauthorized Route: {error && error}</p>;
+  } else return <Loading />;
 };
 
 export default OnboardingPage;

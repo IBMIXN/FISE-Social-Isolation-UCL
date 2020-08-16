@@ -1,11 +1,9 @@
-import { getSession, useSession } from "next-auth/client";
+import { useSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { Formik, Field } from "formik";
 import {
   Text,
-  Icon,
   Heading,
-  Stack,
   FormErrorMessage,
   FormLabel,
   FormControl,
@@ -17,6 +15,7 @@ import {
 import { Nav } from "../../../components/Nav";
 import { Container } from "../../../components/Container";
 import { Main } from "../../../components/Main";
+import Breadcrumbs from "../../../components/Breadcrumbs";
 import { Footer } from "../../../components/Footer.js";
 import Loading from "../../../components/Loading";
 
@@ -67,7 +66,7 @@ const NameForm = ({ router }) => {
         }
         throw await err.json().then((rJson) => {
           setError("name", {
-            message: `HTTP ${err.status} ${err.statusText}: ${rJson.msg}`,
+            message: `HTTP ${err.status} ${err.statusText}: ${rJson.message}`,
           });
           return;
         });
@@ -75,7 +74,10 @@ const NameForm = ({ router }) => {
   };
 
   return (
-    <Formik initialValues={{ name: "", isCloudEnabled: true }} onSubmit={handleFormSubmit}>
+    <Formik
+      initialValues={{ name: "", isCloudEnabled: true }}
+      onSubmit={handleFormSubmit}
+    >
       {({
         isSubmitting,
         getFieldProps,
@@ -123,35 +125,36 @@ const NameForm = ({ router }) => {
   );
 };
 
-const OnboardingPage = () => {
+const NewConsumerPage = () => {
   const [session, loading] = useSession();
   const router = useRouter();
 
-  if (!session && !loading) {
+  if (session) {
+    return (
+      <Container>
+        <Nav />
+        <Main>
+          <Breadcrumbs
+            links={[
+              ["Dashboard", "/dashboard"],
+              ["New User", "#"],
+            ]}
+          />
+          <Heading>Create a New User</Heading>
+          <Text>
+            This should be someone you care for who will contact their loved
+            ones through FISE Lounge.
+          </Text>
+          <NameForm router={router} />
+        </Main>
+        <Footer />
+      </Container>
+    );
+  } else if (!loading && !session) {
+    if (error) console.error(error);
     router.replace("/");
-    return <p>Not authed, sorry</p>;
-  } else {
-    if (!session) {
-      return <Loading />;
-    } else {
-      return (
-        <Container>
-          <Nav />
-          <Main>
-            <Heading>Create a New User</Heading>
-            <Text>
-              This should be someone you care for who will contact their loved
-              ones through FISE Lounge.
-            </Text>
-            <NameForm router={router} />
-          </Main>
-
-          {/* <DarkModeSwitch /> */}
-          <Footer />
-        </Container>
-      );
-    }
-  }
+    return <p>Unauthorized Route</p>;
+  } else return <Loading />;
 };
 
-export default OnboardingPage;
+export default NewConsumerPage;

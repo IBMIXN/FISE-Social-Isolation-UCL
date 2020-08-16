@@ -12,7 +12,7 @@ const fetcher = async (url) =>
         throw err
       }
       throw await err.json().then((rJson) => {
-        return new Error(`HTTP ${err.status} ${err.statusText}: ${rJson.msg}`);
+        return new Error(`HTTP ${err.status} ${err.statusText}: ${rJson.message}`);
       });
     });
 

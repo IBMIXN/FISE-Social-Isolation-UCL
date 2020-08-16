@@ -1,11 +1,8 @@
 import { Flex, Heading } from '@chakra-ui/core'
 
-export const Hero = ({ title }) => (
+export const Hero = () => (
   <Flex justifyContent="center" alignItems="center" height="70vh">
-    <Heading fontSize="10vw">{title}</Heading>
+    <Heading fontSize="10vw">FISE Lounge</Heading>
   </Flex>
 )
 
-Hero.defaultProps = {
-  title: 'FISE Lounge',
-}

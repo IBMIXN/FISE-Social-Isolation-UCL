@@ -25,14 +25,17 @@ const handler = async (req, res) => {
 
     const user = await users.findOne({ email: email });
 
+    let consumer = user.consumers.find((c) => c._id === consumer_id);
+
+    if (!consumer)
+      return res
+        .status(403)
+        .json({ message: "You don't have access to this consumer" });
+
     switch (method) {
       case "GET":
         // ---------------- GET
         try {
-          var consumer = user.consumers.filter(
-            (consumer) => consumer._id === consumer_id
-          )[0];
-
           return res
             .status(200)
             .json({ message: "Consumer Data found", data: consumer });
@@ -45,9 +48,6 @@ const handler = async (req, res) => {
         // ---------------- PUT
         try {
           const { name, isCloudEnabled } = body;
-          var consumer = user.consumers.filter(
-            (consumer) => consumer._id === consumer_id
-          )[0];
 
           consumer.name = name || consumer.name;
           consumer.isCloudEnabled = isCloudEnabled || consumer.isCloudEnabled;
@@ -63,12 +63,11 @@ const handler = async (req, res) => {
         break;
       // ---------------- DELETE
       case "DELETE":
-        console.log("delete");
+        console.log("consumer.DELETE");
         try {
-          const targetIndex = user.consumers.findIndex(
-            (consumer) => consumer._id === consumer_id
-          );
-          consumers.splice(targetIndex, 1);
+          const targetIndex = user.consumers.indexOf(consumer);
+          user.consumers.splice(targetIndex, 1);
+
           await users.updateOne({ email }, { $set: user });
           return res
             .status(200)
