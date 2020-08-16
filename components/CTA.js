@@ -1,4 +1,4 @@
-import { signin, signout, useSession } from 'next-auth/client'
+import { signin } from "next-auth/client";
 import { Link as ChakraLink, Button } from "@chakra-ui/core";
 
 import { Container } from "./Container";
@@ -28,11 +28,6 @@ export const CTA = () => (
           Get Started Now
         </Button>
       </a>
-      {/* <NextLink to="/api/auth/signin">
-        <Button width="100%" variant="solid" variantColor="blue">
-          Get Started Now
-        </Button>
-      </NextLink> */}
     </ChakraLink>
   </Container>
 );

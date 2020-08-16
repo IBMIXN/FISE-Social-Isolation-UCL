@@ -1,19 +1,12 @@
 import { useSession } from "next-auth/client";
-// import Footer from "../components/footer";
-import {
-  Heading,
-  List,
-  ListIcon,
-  ListItem,
-} from "@chakra-ui/core";
+import { Heading, List, ListIcon, ListItem } from "@chakra-ui/core";
 
+import { Container } from "../components/Container";
 import { Nav } from "../components/Nav";
 import { Hero } from "../components/Hero";
-import { Container } from "../components/Container";
 import { Main } from "../components/Main";
-import { DarkModeSwitch } from "../components/DarkModeSwitch";
+import { Footer } from "../components/Footer";
 import { CTA } from "../components/CTA";
-import { Footer } from "../components/Footer.js";
 
 const IndexPage = () => {
   const [session, loading] = useSession();
@@ -42,8 +35,6 @@ const IndexPage = () => {
           </ListItem>
         </List>
       </Main>
-
-      {/* <DarkModeSwitch /> */}
       <Footer />
       {!loading && !session && <CTA />}
     </Container>

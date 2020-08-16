@@ -5,4 +5,4 @@ export {
   TableHead,
   TableHeader,
   TableRow,
-} from './Table';
+} from "./Table";

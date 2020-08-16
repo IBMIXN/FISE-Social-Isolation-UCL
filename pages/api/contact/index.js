@@ -1,9 +1,10 @@
-// New Consumer Routes
+// New Contact Route
 
 import { getSession } from "next-auth/client";
 import { connectToDatabase } from "../../../utils/mongodb";
 import randomWords from "random-words";
 import uuid from "node-uuid";
+import relations from "../../../utils/relations";
 
 const handler = async (req, res) => {
   const session = await getSession({ req });
@@ -18,32 +19,46 @@ const handler = async (req, res) => {
     const db = await client.db(process.env.MONGODB_DB);
     const users = db.collection("users");
 
-    const user = await users.findOne({ email: email });
-    
+    const user = await users.findOne({ email });
+
     switch (method) {
       case "POST":
         // ---------------- POST
         try {
-          const { name, isCloudEnabled } = body;
-          if (!name || !isCloudEnabled) throw new Error("Missing params");
-          var consumer = {
+          const {
+            consumer_id,
+            name,
+            email: contact_email,
+            profileImage,
+            relation: relationStr,
+          } = body;
+
+          const relation = relations.indexOf(relationStr.toLowerCase());
+
+          if (!name || !consumer_id || relation < 0)
+            throw new Error("Missing params");
+
+          var newContact = {
             _id: uuid.v4(),
             name: name,
-            isCloudEnabled: isCloudEnabled,
-            otc: randomWords(3).join("-"),
-            ar_scenes: [],
-            contacts: [],
+            email: contact_email,
+            relation: relation,
+            profileImage: "",
           };
 
-          user.consumers.push(consumer);
+          let consumer = user.consumers.find((c) => c._id === consumer_id);
+
+          consumer.contacts.push(newContact);
 
           await users.updateOne({ email }, { $set: user });
           return res
             .status(200)
-            .json({ message: "Consumer added successfully", data: consumer });
+            .json({ message: "Contact added successfully", data: newContact });
         } catch (err) {
-          console.error(`api.consumer.POST: ${err}`);
-          return res.status(400).json({ message: "Database error" });
+          console.error(`api.contact.POST: ${err}`);
+          return res
+            .status(400)
+            .json({ msg: `Database error: ${err.message}` });
         }
         break;
       case "GET":

@@ -1,6 +1,8 @@
 import { useSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import useSWR from "swr";
+import { Formik, Field } from "formik";
+
 import fetcher from "../../../utils/fetcher";
 
 import {
@@ -11,9 +13,10 @@ import {
   Input,
   FormErrorMessage,
   Checkbox,
+  Link as ChakraLink,
+  Text,
+  Heading,
 } from "@chakra-ui/core";
-
-import { Link as ChakraLink, Text, Icon, Heading } from "@chakra-ui/core";
 
 import {
   Table,
@@ -27,10 +30,13 @@ import {
 import { Nav } from "../../../components/Nav";
 import { Container } from "../../../components/Container";
 import { Main } from "../../../components/Main";
-import { Footer } from "../../../components/Footer.js";
+import { Footer } from "../../../components/Footer";
 import Loading from "../../../components/Loading";
-import { Formik, Field } from "formik";
-import { useState } from "react";
+import relations from "../../../utils/relations";
+import Breadcrumbs from "../../../components/Breadcrumbs";
+
+const capitalize = ([first, ...rest]) =>
+  first.toUpperCase() + rest.join("").toLowerCase();
 
 const MakeChangesForm = (props) => {
   const { currentName, isCloudEnabled } = props;
@@ -47,18 +53,9 @@ const MakeChangesForm = (props) => {
     return error;
   }
 
-  function validateEmail(value) {
-    let error = "";
-    // if (!value) {
-    //   error = "Required";
-    // } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)) {
-    //   error = "Invalid email address";
-    // }
-  }
-
   return (
     <Formik
-      initialValues={{ name: currentName, isCloudEnabled: true }}
+      initialValues={{ name: currentName, isCloudEnabled: isCloudEnabled }}
       onSubmit={(values, actions) => {
         setTimeout(() => {
           alert(JSON.stringify(values, null, 2));
@@ -114,12 +111,14 @@ const MakeChangesForm = (props) => {
   );
 };
 
-
 const ConsumerPage = () => {
   const [session, loading] = useSession();
   const router = useRouter();
   const { consumer_id } = router.query;
-  const { data, error } = useSWR(`/api/consumer/${consumer_id}`, fetcher);
+  const { data, error } = useSWR(
+    consumer_id && `/api/consumer/${consumer_id}`,
+    fetcher
+  );
 
   const handleDeleteConsumer = async () => {
     const options = {
@@ -128,7 +127,7 @@ const ConsumerPage = () => {
       //   "Content-Type": "application/x-www-form-urlencoded",
       // },
     };
-    await fetch(`/api/consumer/${consumer_id}`, options)
+    await fetch(consumer_id && `/api/consumer/${consumer_id}`, options)
       .then((r) => {
         if (r.ok) {
           router.replace("/dashboard");
@@ -141,107 +140,112 @@ const ConsumerPage = () => {
           throw err;
         }
         throw await err.json().then((rJson) => {
-          console.error(`HTTP ${err.status} ${err.statusText}: ${rJson.msg}`);
+          console.error(
+            `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
+          );
           return;
         });
       });
-  }
+  };
 
-  if (!session && !loading) {
-    router.replace("/");
-    return <p>Not authed, sorry</p>;
-  } else {
-    if ((loading || !data) && !error) {
-      return <Loading />;
-    } else {
-      return (
-        <Container>
-          <Nav />
-          <Main>
-            <Heading>Editing {data.name}'s Profile</Heading>
-            <MakeChangesForm
-              currentName={data.name}
-              isCloudEnabled={data.isCloudEnabled}
-            />
-            {error && <Text color="red.400">Error: {error.message}</Text>}
-
-            {data && (
-              <Box mt="3rem">
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableHeader>Name</TableHeader>
-                      <TableHeader>Scenes</TableHeader>
-                      <TableHeader>Contacts</TableHeader>
-                      <TableHeader />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {data.contacts &&
-                      data.contacts.map((contact, index) => (
-                        <TableRow
-                          bg={index % 2 === 0 ? "white" : "gray.50"}
-                          key={index}
-                        >
-                          <TableCell>
-                            <Text fontSize="sm" color="gray.600">
-                              {contact.name}
-                            </Text>
-                          </TableCell>
-                          <TableCell>
-                            <Text fontSize="sm" color="gray.500">
-                              {contact.contacts.length}
-                            </Text>
-                          </TableCell>
-                          <TableCell>
-                            <Text fontSize="sm" color="gray.500">
-                              {contact.ar_scenes.length}
-                            </Text>
-                          </TableCell>
-                          <TableCell textAlign="right">
-                            <ChakraLink
-                              href={`/dashboard/contact/${contact._id}`}
-                              fontSize="sm"
-                              fontWeight="medium"
-                              color="blue.600"
-                            >
-                              Edit
-                            </ChakraLink>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    <TableRow bg="white">
-                      <TableCell>
-                        <Button
-                          as="a"
-                          href="/dashboard/contact/new"
-                          leftIcon="add"
-                          color="gray.600"
-                        >
-                          Add a new contact
-                        </Button>
-                      </TableCell>
-                      <TableCell />
-                      <TableCell />
-                      <TableCell />
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </Box>
-            )}
+  if (session && data) {
+    return (
+      <Container>
+        <Nav />
+        <Main>
+          <Breadcrumbs
+            links={[
+              ["Dashboard", "/dashboard"],
+              [`${data.name}'s User Profile`, "#"],
+            ]}
+          />
+          <Heading>Editing {data.name}'s Profile</Heading>
+          <MakeChangesForm
+            currentName={data.name}
+            isCloudEnabled={data.isCloudEnabled}
+          />
+          {data && (
             <Box mt="3rem">
-              <Button leftIcon="close" variantColor="red" onClick={handleDeleteConsumer}>
-                Delete This User
-              </Button>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>Name</TableHeader>
+                    <TableHeader>Email</TableHeader>
+                    <TableHeader>Relation</TableHeader>
+                    <TableHeader />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {data.contacts &&
+                    data.contacts.map((contact, index) => (
+                      <TableRow
+                        bg={index % 2 === 0 ? "white" : "gray.50"}
+                        key={index}
+                      >
+                        <TableCell>
+                          <Text fontSize="sm" color="gray.600">
+                            {contact.name}
+                          </Text>
+                        </TableCell>
+                        <TableCell>
+                          <Text fontSize="sm" color="gray.500">
+                            {contact.email}
+                          </Text>
+                        </TableCell>
+                        <TableCell>
+                          <Text fontSize="sm" color="gray.500">
+                            {capitalize(relations[contact.relation])}
+                          </Text>
+                        </TableCell>
+                        <TableCell textAlign="right">
+                          <ChakraLink
+                            href={`/dashboard/contact/${contact._id}`}
+                            fontSize="sm"
+                            fontWeight="medium"
+                            color="blue.600"
+                          >
+                            Edit
+                          </ChakraLink>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  <TableRow bg="white">
+                    <TableCell>
+                      <Button
+                        as="a"
+                        href={`/dashboard/contact/new/${consumer_id}`}
+                        leftIcon="add"
+                        color="gray.600"
+                      >
+                        Add a new contact
+                      </Button>
+                    </TableCell>
+                    <TableCell />
+                    <TableCell />
+                    <TableCell />
+                  </TableRow>
+                </TableBody>
+              </Table>
             </Box>
-          </Main>
-
-          {/* <DarkModeSwitch /> */}
-          <Footer />
-        </Container>
-      );
-    }
-  }
+          )}
+          <Box mt="3rem">
+            <Button
+              leftIcon="close"
+              variantColor="red"
+              onClick={handleDeleteConsumer}
+            >
+              Delete This User
+            </Button>
+          </Box>
+        </Main>
+        <Footer />
+      </Container>
+    );
+  } else if ((!loading && !session) || error) {
+    if (error) console.error(error);
+    router.replace("/");
+    return <p>Unauthorized Route: {error && error}</p>;
+  } else return <Loading />;
 };
 
 export default ConsumerPage;

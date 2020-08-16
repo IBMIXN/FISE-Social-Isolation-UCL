@@ -1,12 +1,12 @@
 import { Provider } from "next-auth/client";
-import { ThemeProvider, CSSReset, ColorModeProvider, DarkMode } from "@chakra-ui/core";
+import { ThemeProvider, CSSReset, DarkMode } from "@chakra-ui/core";
 
 import theme from "../theme";
 
 const App = ({ Component, pageProps }) => {
   const { session } = pageProps;
   return (
-    <Provider options={{ site: process.env.SITE }} session={session}>
+    <Provider options={{ site: process.env.NEXTAUTH_URL }} session={session}>
       <ThemeProvider theme={theme}>
         <DarkMode>
           <CSSReset />

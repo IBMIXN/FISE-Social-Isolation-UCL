@@ -1,5 +1,4 @@
 import { useState } from "react";
-import NextLink from "next/link"
 import { signin, signout, useSession } from "next-auth/client";
 import { Box, Heading, Flex, Text, Button } from "@chakra-ui/core";
 
@@ -23,7 +22,6 @@ export const Nav = ({ props }) => {
       wrap="wrap"
       padding="1rem"
       px="1.5rem"
-      // bg="blue.500"
       color="white"
       w={["100%", "100%", 3 / 4]}
       {...props}
@@ -57,9 +55,10 @@ export const Nav = ({ props }) => {
         <MenuItems>Blog</MenuItems>
       </Box> */}
 
-      <Box 
-      // display={[show ? "block" : "none", "block"]} 
-      mt={{ base: 4, md: 0 }}>
+      <Box
+        // display={[show ? "block" : "none", "block"]}
+        mt={{ base: 4, md: 0 }}
+      >
         {!session && (
           <Button
             as="a"
@@ -70,6 +69,7 @@ export const Nav = ({ props }) => {
             }}
             bg="transparent"
             border="1px"
+            isLoading={loading}
           >
             Get Started
           </Button>

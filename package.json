@@ -16,7 +16,7 @@
     "formik": "^2.1.5",
     "mongodb": "^3.6.0",
     "next": "latest",
-    "next-auth": "^2.1.0",
+    "next-auth": "^3.1.0",
     "node-uuid": "^1.4.8",
     "random-words": "^1.1.1",
     "react": "^16.13.1",

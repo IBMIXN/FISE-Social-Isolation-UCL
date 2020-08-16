@@ -24,7 +24,6 @@ export const Footer = (props) => (
         <Icon
           name="ibm"
           color="grey.300"
-          // color="blue.600"
           w="200px"
           h="50px"
           m="1rem"
@@ -34,7 +33,6 @@ export const Footer = (props) => (
         <Icon
           name="nhs"
           color="gray.400"
-          // color="blue.600"
           w="200px"
           h="50px"
           m="1rem"
@@ -44,7 +42,6 @@ export const Footer = (props) => (
         <Icon
           name="ucl"
           color="gray.400"
-          // color="blue.600"
           w="200px"
           h="50px"
           m="1rem"
