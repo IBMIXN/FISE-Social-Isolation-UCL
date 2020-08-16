@@ -24,7 +24,7 @@ import {
 import { Nav } from "../components/Nav";
 import { Container } from "../components/Container";
 import { Main } from "../components/Main";
-import { Footer } from "../components/Footer.js";
+import { Footer } from "../components/Footer";
 import Loading from "../components/Loading";
 
 const DashboardPage = () => {

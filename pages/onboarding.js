@@ -14,7 +14,7 @@ import {
 import { Container } from "../components/Container";
 import { Nav } from "../components/Nav";
 import { Main } from "../components/Main";
-import { Footer } from "../components/Footer.js";
+import { Footer } from "../components/Footer";
 import Loading from "../components/Loading";
 
 const NameForm = ({ router }) => {

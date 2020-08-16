@@ -20,7 +20,7 @@ import Loading from "../../../../components/Loading";
 import { Nav } from "../../../../components/Nav";
 import { Container } from "../../../../components/Container";
 import { Main } from "../../../../components/Main";
-import { Footer } from "../../../../components/Footer.js";
+import { Footer } from "../../../../components/Footer";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
 
 const NameForm = ({ router }) => {
