@@ -6,7 +6,7 @@ const fetcher = async (url) =>
       }
       throw r;
     })
-    .then((json) => json.data)
+    .then(({message, data}) => data)
     .catch(async (err) => {
       if (err instanceof Error) {
         throw err

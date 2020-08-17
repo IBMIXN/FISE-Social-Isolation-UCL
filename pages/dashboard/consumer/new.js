@@ -53,7 +53,7 @@ const NameForm = ({ router }) => {
         }
         throw r;
       })
-      .then((json) => {
+      .then(({message, data}) => {
         setTimeout(() => {
           router.replace("/dashboard");
           actions.setSubmitting(false);

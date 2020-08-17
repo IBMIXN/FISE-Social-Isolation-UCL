@@ -63,7 +63,6 @@ const handler = async (req, res) => {
         break;
       // ---------------- DELETE
       case "DELETE":
-        console.log("consumer.DELETE");
         try {
           const targetIndex = user.consumers.indexOf(consumer);
           user.consumers.splice(targetIndex, 1);

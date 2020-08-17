@@ -51,7 +51,7 @@ const NameForm = ({ router }) => {
         }
         throw r;
       })
-      .then((json) => {
+      .then(({message, data}) => {
         setTimeout(() => {
           router.replace("/");
           actions.setSubmitting(false);

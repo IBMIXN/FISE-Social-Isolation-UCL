@@ -16,6 +16,14 @@ import {
   Link as ChakraLink,
   Text,
   Heading,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
 } from "@chakra-ui/core";
 
 import {
@@ -38,9 +46,40 @@ import Breadcrumbs from "../../../components/Breadcrumbs";
 const capitalize = ([first, ...rest]) =>
   first.toUpperCase() + rest.join("").toLowerCase();
 
-const MakeChangesForm = (props) => {
-  const { currentName, isCloudEnabled } = props;
+const DeleteUserModal = ({ onClick }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  return (
+    <>
+      <Button
+        leftIcon="delete"
+        variant="outline"
+        variantColor="red"
+        onClick={onOpen}
+      >
+        Delete This User
+      </Button>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Delete This User?</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>Are you sure you want to perform this action?</ModalBody>
 
+          <ModalFooter>
+            <Button variantColor="blue" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button variantColor="red" onClick={onClick}>
+              Confirm
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};
+
+const MakeChangesForm = ({currentName, isCloudEnabled, consumer_id, router}) => {
   function validateName(value) {
     let error = "";
     if (!value) {
@@ -53,15 +92,51 @@ const MakeChangesForm = (props) => {
     return error;
   }
 
+  const handleFormSubmit = async (values, actions) => {
+    const formBody = Object.entries(values)
+      .map(
+        ([key, value]) =>
+          encodeURIComponent(key) + "=" + encodeURIComponent(value)
+      )
+      .join("&");
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: formBody,
+    };
+    await fetch(`/api/consumer/${consumer_id}`, options)
+      .then((r) => {
+        if (r.ok) {
+          return r.json();
+        }
+        throw r;
+      })
+      .then(({ message, data }) => {
+        setTimeout(() => {
+          router.replace(`/dashboard`);
+          actions.setSubmitting(false);
+        }, 1500);
+      })
+      .catch(async (err) => {
+        actions.setSubmitting(false);
+        if (err instanceof Error) {
+          throw err;
+        }
+        throw await err.json().then((rJson) => {
+          console.error(
+            `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
+          );
+          return;
+        });
+      });
+  };
+
   return (
     <Formik
       initialValues={{ name: currentName, isCloudEnabled: isCloudEnabled }}
-      onSubmit={(values, actions) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          actions.setSubmitting(false);
-        }, 1000);
-      }}
+      onSubmit={handleFormSubmit}
     >
       {({
         isSubmitting,
@@ -121,13 +196,9 @@ const ConsumerPage = () => {
   );
 
   const handleDeleteConsumer = async () => {
-    const options = {
+    await fetch(consumer_id && `/api/consumer/${consumer_id}`, {
       method: "DELETE",
-      // headers: {
-      //   "Content-Type": "application/x-www-form-urlencoded",
-      // },
-    };
-    await fetch(consumer_id && `/api/consumer/${consumer_id}`, options)
+    })
       .then((r) => {
         if (r.ok) {
           router.replace("/dashboard");
@@ -161,6 +232,8 @@ const ConsumerPage = () => {
           />
           <Heading>Editing {data.name}'s Profile</Heading>
           <MakeChangesForm
+            router={router}
+            consumer_id={consumer_id}
             currentName={data.name}
             isCloudEnabled={data.isCloudEnabled}
           />
@@ -229,13 +302,7 @@ const ConsumerPage = () => {
             </Box>
           )}
           <Box mt="3rem">
-            <Button
-              leftIcon="close"
-              variantColor="red"
-              onClick={handleDeleteConsumer}
-            >
-              Delete This User
-            </Button>
+            <DeleteUserModal onClick={handleDeleteConsumer} />
           </Box>
         </Main>
         <Footer />

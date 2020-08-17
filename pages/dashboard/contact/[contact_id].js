@@ -82,9 +82,9 @@ const MakeChangesForm = ({
         }
         throw r;
       })
-      .then((json) => {
+      .then(({ message, data }) => {
         setTimeout(() => {
-          // router.back();
+          router.replace(`/dashboard/consumer/${data.consumer_id}`);
           actions.setSubmitting(false);
         }, 1500);
       })
@@ -97,9 +97,6 @@ const MakeChangesForm = ({
           console.error(
             `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
           );
-          // setError("name", {
-          //   message: `HTTP ${err.status} ${err.statusText}: ${rJson.message}`,
-          // });
           return;
         });
       });
@@ -148,7 +145,7 @@ const MakeChangesForm = ({
               What relation is this person to ?
             </FormLabel>
 
-            <Field as={Select} name="relation">
+            <Field as={Select} name="relation" placeholder="Select Relation">
               <option value="son">Their son</option>
               <option value="daughter">Their daughter</option>
               <option value="grandson">Their grandson</option>
@@ -225,7 +222,7 @@ const ConsumerPage = () => {
               ["Contacts", "#"],
             ]}
           />
-          <Heading>Editing {data.name}'s Profile</Heading>
+          <Heading>Editing {data.name}'s Contact Details</Heading>
           <MakeChangesForm
             router={router}
             currentName={data.name}
@@ -236,11 +233,11 @@ const ConsumerPage = () => {
           {error && <Text color="red.400">Error: {error.message}</Text>}
           <Box mt="3rem">
             <Button
-              leftIcon="close"
+              leftIcon="delete"
               variantColor="red"
               onClick={handleDeleteContact}
             >
-              Delete This User
+              Delete This Contact
             </Button>
           </Box>
         </Main>

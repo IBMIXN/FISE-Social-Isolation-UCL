@@ -74,10 +74,9 @@ const NameForm = ({ router }) => {
         }
         throw r;
       })
-      .then((r) => {
-        const {message, data} = r
+      .then(({message, data}) => {
         setTimeout(() => {
-          router.replace(`/dashboard/contact/${data._id}`);
+          router.replace(`/dashboard/consumer/${router.query.consumer_id}`);
           actions.setSubmitting(false);
         }, 1500);
       })
@@ -132,7 +131,7 @@ const NameForm = ({ router }) => {
           <FormControl>
             <FormLabel htmlFor="relation">What relation is this?</FormLabel>
 
-            <Field as={Select} name="relation">
+            <Field as={Select} name="relation" placeholder="Select Relation">
               <option value="son">Their son</option>
               <option value="daughter">Their daughter</option>
               <option value="grandson">Their grandson</option>

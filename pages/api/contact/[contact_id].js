@@ -30,7 +30,7 @@ const handler = async (req, res) => {
 
     const user = await users.findOne({ email: email });
 
-    const consumer = user.consumers.find(
+    let consumer = user.consumers.find(
       (cons) => cons.contacts.findIndex((c) => c._id === contact_id) !== -1
     );
 
@@ -39,9 +39,9 @@ const handler = async (req, res) => {
         .status(403)
         .json({ message: "You don't have access to this contact" });
 
-    let contact = consumer.contacts.find((c) => c._id === contact_id);
+    let contactIndex = consumer.contacts.findIndex((c) => c._id === contact_id)
 
-    if (!contact)
+    if (contactIndex < 0)
       return res
         .status(403)
         .json({ message: "You don't have access to this contact" });
@@ -50,7 +50,7 @@ const handler = async (req, res) => {
       case "GET":
         // ---------------- GET
         try {
-
+          const contact = consumer.contacts[contactIndex]
           return res
             .status(200)
             .json({ message: "Contact Data found", data: {...contact, consumer_id: consumer._id} });
@@ -72,20 +72,14 @@ const handler = async (req, res) => {
           const relation = relations.indexOf(relationStr);
 
           if (relation < 0) throw new Error("Invalid relation");
-          console.log("contact.put First", 
-          // contact);
-          user.consumers[0]);
-          contact = {
-            ...contact,
+          
+          consumer.contacts[contactIndex] = {
+            ...consumer.contacts[contactIndex],
             ...(name && { name }),
             ...(contactEmail && { email: contactEmail }),
             ...(profileImage && { profileImage }),
             ...(relation && { relation }),
           };
-          console.log("Second", 
-          // contact);
-          user.consumers[0]);
-
 
           await users.updateOne({ email }, { $set: user });
           return res
@@ -98,16 +92,12 @@ const handler = async (req, res) => {
         break;
       // ---------------- DELETE
       case "DELETE":
-        console.log("delete");
         try {
-          console.log(contact);
-          const targetIndex = consumer.contacts.indexOf(contact)
-
-          consumer.contacts.splice(targetIndex, 1);
+          consumer.contacts.splice(contactIndex, 1);
           await users.updateOne({ email }, { $set: user });
           return res
             .status(200)
-            .json({ message: "Contact Deleted successfully" });
+            .json({ message: "Contact Deleted successfully", data: {consumer_id: consumer._id} });
         } catch (err) {
           console.error(`api.contact.DELETE: ${err}`);
           return res.status(400).json({ message: "Database error" });
