@@ -13,7 +13,7 @@ import React from "react";
  */
 export function Table(props) {
   return (
-    <Box shadow="sm" rounded="lg" overflow="hidden">
+    <Box shadow="sm" rounded="lg" overflow={["scroll", "hidden"]}>
       <Box as="table" width="full" {...props} />
     </Box>
   );

@@ -99,7 +99,7 @@ const DashboardPage = () => {
   };
 
   if (session && data) {
-    if (!data.name) router.replace("/onboarding")
+    if (!data.name) router.replace("/onboarding");
     return (
       <Container>
         <Nav />
@@ -137,7 +137,12 @@ const DashboardPage = () => {
                       key={index}
                     >
                       <TableCell>
-                        <Text fontSize="sm" color="gray.600">
+                        <Text
+                          fontSize="sm"
+                          color="gray.600"
+                          as="a"
+                          href={`/dashboard/consumer/${consumer._id}`}
+                        >
                           {consumer.name}
                         </Text>
                       </TableCell>

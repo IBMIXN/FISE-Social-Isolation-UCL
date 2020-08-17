@@ -256,7 +256,12 @@ const ConsumerPage = () => {
                         key={index}
                       >
                         <TableCell>
-                          <Text fontSize="sm" color="gray.600">
+                          <Text
+                            fontSize="sm"
+                            color="gray.600"
+                            as="a"
+                            href={`/dashboard/contact/${contact._id}`}
+                          >
                             {contact.name}
                           </Text>
                         </TableCell>
