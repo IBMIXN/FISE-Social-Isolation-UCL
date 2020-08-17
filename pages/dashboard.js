@@ -99,6 +99,7 @@ const DashboardPage = () => {
   };
 
   if (session && data) {
+    if (!data.name) router.replace("/onboarding")
     return (
       <Container>
         <Nav />
