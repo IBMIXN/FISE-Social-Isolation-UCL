@@ -43,7 +43,7 @@ const handler = async (req, res) => {
             .json({ message: "Consumer added successfully", data: consumer });
         } catch (err) {
           console.error(`api.consumer.POST: ${err}`);
-          return res.status(400).json({ message: "Database error" });
+          return res.status(500).json({ message: "Database error" });
         }
         break;
       case "GET":
@@ -53,7 +53,7 @@ const handler = async (req, res) => {
       case "DELETE":
       // ---------------- DELETE
       default:
-        return res.status(400).json({ message: "This route does not exist" });
+        return res.status(405).json({ message: "This route does not exist" });
         break;
     }
   } else {

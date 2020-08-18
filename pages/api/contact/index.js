@@ -48,6 +48,11 @@ const handler = async (req, res) => {
 
           let consumer = user.consumers.find((c) => c._id === consumer_id);
 
+          if (consumer.contacts.find((c) => c.email === contact_email))
+            return res
+              .status(400)
+              .json({ message: "A contact with that email already exists" });
+
           consumer.contacts.push(newContact);
 
           await users.updateOne({ email }, { $set: user });
@@ -57,7 +62,7 @@ const handler = async (req, res) => {
         } catch (err) {
           console.error(`api.contact.POST: ${err}`);
           return res
-            .status(400)
+            .status(500)
             .json({ msg: `Database error: ${err.message}` });
         }
         break;
@@ -68,7 +73,7 @@ const handler = async (req, res) => {
       case "DELETE":
       // ---------------- DELETE
       default:
-        return res.status(400).json({ message: "This route does not exist" });
+        return res.status(405).json({ message: "This route does not exist" });
         break;
     }
   } else {
