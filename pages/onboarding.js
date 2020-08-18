@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/client";
+import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { Formik, Field } from "formik";
 import {
@@ -16,6 +16,7 @@ import { Nav } from "../components/Nav";
 import { Main } from "../components/Main";
 import { Footer } from "../components/Footer";
 import Loading from "../components/Loading";
+import { useEffect } from "react";
 
 const NameForm = ({ router }) => {
   function validateName(value) {
@@ -51,11 +52,11 @@ const NameForm = ({ router }) => {
         }
         throw r;
       })
-      .then(({message, data}) => {
-        setTimeout(() => {
-          router.replace("/");
-          actions.setSubmitting(false);
-        }, 2500);
+      .then(({ message, data }) => {
+        // setTimeout(() => {
+        router.replace("/dashboard");
+        actions.setSubmitting(false);
+        // }, 500);
       })
       .catch(async (err) => {
         actions.setSubmitting(false);
@@ -106,33 +107,39 @@ const NameForm = ({ router }) => {
   );
 };
 
-const OnboardingPage = () => {
-  const [session, loading] = useSession();
+const OnboardingPage = ({ session }) => {
   const router = useRouter();
 
-  if (session) {
-    if (session.user.name) {
-      router.replace("/dashboard");
-      return <Loading />;
-    } else {
-      return (
-        <Container>
-          <Nav />
-          <Main>
-            <Heading>Welcome to the FISE Lounge Dashboard</Heading>
-            <Text>
-              Please give us your name so we can finish setting up your account!
-            </Text>
-            <NameForm router={router} />
-          </Main>
-          <Footer />
-        </Container>
-      );
-    }
-  } else if (!loading && !session) {
-    router.replace("/");
-    return <p>Unauthorized Route: {error && JSON.stringify(error)}</p>;
-  } else return <Loading />;
+  useEffect(() => {
+    if (!session) router.replace("/");
+    if (session.user.name) router.replace("/dashboard");
+  }, []);
+
+  return session ? (
+    <Container>
+      <Nav />
+      <Main>
+        <Heading>Welcome to the FISE Lounge Dashboard</Heading>
+        <Text>
+          Please give us your name so we can finish setting up your account!
+        </Text>
+        <NameForm router={router} />
+      </Main>
+      <Footer />
+    </Container>
+  ) : (
+    <Loading />
+  );
 };
 
 export default OnboardingPage;
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  return {
+    props: {
+      session,
+    },
+  };
+}

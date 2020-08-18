@@ -1,4 +1,4 @@
-import { signOut, useSession } from "next-auth/client";
+import { signOut, getSession, useSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import useSWR, { mutate } from "swr";
 
@@ -34,6 +34,8 @@ import { Container } from "../components/Container";
 import { Main } from "../components/Main";
 import { Footer } from "../components/Footer";
 import Loading from "../components/Loading";
+import { useEffect } from "react";
+import Breadcrumbs from "../components/Breadcrumbs";
 
 const DeleteUserModal = ({ onClick }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -68,10 +70,8 @@ const DeleteUserModal = ({ onClick }) => {
   );
 };
 
-const DashboardPage = () => {
-  const [session, loading] = useSession();
+const DashboardPage = ({ data, session }) => {
   const router = useRouter();
-  const { data, error } = useSWR("/api/user", fetcher);
 
   const handleDeleteUser = async () => {
     await fetch(`/api/user`, {
@@ -79,8 +79,8 @@ const DashboardPage = () => {
     })
       .then((r) => {
         if (r.ok) {
+          signOut({ callbackUrl: process.env.NEXTAUTH_URL });
           router.replace("/");
-          signOut({callbackUrl: process.env.NEXTAUTH_URL});
           return;
         }
         throw r;
@@ -98,106 +98,129 @@ const DashboardPage = () => {
       });
   };
 
-  if (session && data) {
-    if (!data.name) router.replace("/onboarding");
-    return (
-      <Container>
-        <Nav />
-        <Main>
-          <Heading>Welcome to the Dashboard, {session.user.name}</Heading>
-          <Box mt="3rem">
-            <Button
-              leftIcon="exit"
-              variantColor="red"
-              onClick={() => {
-                router.replace("/api/auth/signout");
-                signOut();
-                return;
-              }}
-            >
-              Sign Out
-            </Button>
-          </Box>
+  useEffect(() => {
+    if (!session) router.replace("/");
+    if (data && !data.name) router.replace("/onboarding");
+  }, []);
 
-          <Box mt="3rem">
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeader>Name</TableHeader>
-                  <TableHeader>Contacts</TableHeader>
-                  <TableHeader>One-Time-Code</TableHeader>
-                  <TableHeader />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {data.consumers &&
-                  data.consumers.map((consumer, index) => (
-                    <TableRow
-                      bg={index % 2 === 0 ? "white" : "gray.50"}
-                      key={index}
-                    >
-                      <TableCell>
-                        <Text
-                          fontSize="sm"
-                          color="gray.600"
-                          as="a"
-                          href={`/dashboard/consumer/${consumer._id}`}
-                        >
-                          {consumer.name}
-                        </Text>
-                      </TableCell>
-                      <TableCell>
-                        <Text fontSize="sm" color="gray.500">
-                          {consumer.contacts.length}
-                        </Text>
-                      </TableCell>
-                      <TableCell>
-                        <Text fontSize="sm" color="gray.500">
-                          {consumer.otc}
-                        </Text>
-                      </TableCell>
-                      <TableCell textAlign="right">
-                        <ChakraLink
-                          href={`/dashboard/consumer/${consumer._id}`}
-                          fontSize="sm"
-                          fontWeight="medium"
-                          color="blue.600"
-                        >
-                          Edit
-                        </ChakraLink>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                <TableRow bg="white">
-                  <TableCell>
-                    <Button
-                      as="a"
-                      href="/dashboard/consumer/new"
-                      leftIcon="add"
-                      color="gray.600"
-                    >
-                      Add a new user
-                    </Button>
-                  </TableCell>
-                  <TableCell />
-                  <TableCell />
-                  <TableCell />
-                </TableRow>
-              </TableBody>
-            </Table>
-          </Box>
-          <Box mt="3rem">
-            <DeleteUserModal onClick={handleDeleteUser} />
-          </Box>
-        </Main>
-        <Footer />
-      </Container>
-    );
-  } else if ((!loading && !session) || error) {
-    if (error) console.error(error);
-    router.replace("/");
-    return <p>Unauthorized Route: {error && JSON.stringify(error)}</p>;
-  } else return <Loading />;
+  return session && data ? (
+    <Container>
+      <Nav />
+      <Main>
+        <Breadcrumbs links={[["Dashboard", "/dashboard"]]} />
+        <Heading>Welcome to the Dashboard, {session.user.name}</Heading>
+        <Box mt="3rem">
+          <Button
+            leftIcon="exit"
+            variantColor="red"
+            onClick={() => {
+              router.replace("/api/auth/signout");
+              signOut();
+              return;
+            }}
+          >
+            Sign Out
+          </Button>
+        </Box>
+
+        <Box mt="3rem">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Name</TableHeader>
+                <TableHeader>Contacts</TableHeader>
+                <TableHeader>One-Time-Code</TableHeader>
+                <TableHeader />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.consumers &&
+                data.consumers.map((consumer, index) => (
+                  <TableRow
+                    bg={index % 2 === 0 ? "white" : "gray.50"}
+                    key={index}
+                  >
+                    <TableCell>
+                      <Text
+                        fontSize="sm"
+                        color="gray.600"
+                        as="a"
+                        href={`/dashboard/consumer/${consumer._id}`}
+                      >
+                        {consumer.name}
+                      </Text>
+                    </TableCell>
+                    <TableCell>
+                      <Text fontSize="sm" color="gray.500">
+                        {consumer.contacts.length}
+                      </Text>
+                    </TableCell>
+                    <TableCell>
+                      <Text fontSize="sm" color="gray.500">
+                        {consumer.otc}
+                      </Text>
+                    </TableCell>
+                    <TableCell textAlign="right">
+                      <ChakraLink
+                        href={`/dashboard/consumer/${consumer._id}`}
+                        fontSize="sm"
+                        fontWeight="medium"
+                        color="blue.600"
+                      >
+                        Edit
+                      </ChakraLink>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              <TableRow bg="white">
+                <TableCell>
+                  <Button
+                    as="a"
+                    href="/dashboard/consumer/new"
+                    leftIcon="add"
+                    color="gray.600"
+                  >
+                    Add a new user
+                  </Button>
+                </TableCell>
+                <TableCell />
+                <TableCell />
+                <TableCell />
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Box>
+        <Box mt="3rem">
+          <DeleteUserModal onClick={handleDeleteUser} />
+        </Box>
+      </Main>
+      <Footer />
+    </Container>
+  ) : (
+    <Loading />
+  );
 };
 
 export default DashboardPage;
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+  let data = null;
+
+  if (session) {
+    const hostname = process.env.NEXTAUTH_URL;
+    const options = { headers: { cookie: context.req.headers.cookie } };
+    const res = await fetch(`${hostname}/api/user`, options);
+    const json = await res.json();
+    if (json.data) {
+      data = json.data;
+    }
+  }
+
+  return {
+    props: {
+      session,
+      data,
+    },
+  };
+}

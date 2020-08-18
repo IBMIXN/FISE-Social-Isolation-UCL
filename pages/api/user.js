@@ -28,7 +28,7 @@ const handler = async (req, res) => {
           }
         } catch (err) {
           console.error(`api.user.GET: ${err}`);
-          return res.status(400).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Database error" });
         }
         break;
       case "POST":
@@ -45,7 +45,7 @@ const handler = async (req, res) => {
           return res.status(200).json({ msg: "Updated successfully" });
         } catch (err) {
           console.error(`api.user.POST: ${err}`);
-          return res.status(400).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Database error" });
         }
         break;
       case "PUT":
@@ -59,7 +59,7 @@ const handler = async (req, res) => {
           return res.status(200).json({ msg: "Updated successfully" });
         } catch (err) {
           console.error(`api.user.PUT: ${err}`);
-          return res.status(400).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Database error" });
         }
         break;
       // ---------------- DELETE
@@ -69,12 +69,12 @@ const handler = async (req, res) => {
           return res.status(200).json({ msg: "Deleted successfully" });
         } catch (err) {
           console.error(`api.user.DELETE: ${err}`);
-          return res.status(400).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Database error" });
         }
         break;
 
       default:
-        return res.status(400).json({ msg: "This route does not exist" });
+        return res.status(405).json({ msg: "This route does not exist" });
         break;
     }
   } else {

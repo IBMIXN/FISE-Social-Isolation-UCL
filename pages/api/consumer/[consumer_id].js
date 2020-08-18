@@ -41,7 +41,7 @@ const handler = async (req, res) => {
             .json({ message: "Consumer Data found", data: consumer });
         } catch (err) {
           console.error(`api.consumer.GET: ${err}`);
-          return res.status(400).json({ message: "Unexpected error" });
+          return res.status(500).json({ message: "Unexpected error" });
         }
         break;
       case "PUT":
@@ -55,10 +55,10 @@ const handler = async (req, res) => {
           await users.updateOne({ email }, { $set: user });
           return res
             .status(200)
-            .json({ message: "Consumer updated successfully" });
+            .json({ message: "Consumer updated successfully", data: {...consumer, consumer_id} });
         } catch (err) {
           console.error(`api.consumer.PUT: ${err}`);
-          return res.status(400).json({ message: "Database error" });
+          return res.status(500).json({ message: "Database error" });
         }
         break;
       // ---------------- DELETE
@@ -73,13 +73,13 @@ const handler = async (req, res) => {
             .json({ message: "Consumer Deleted successfully" });
         } catch (err) {
           console.error(`api.consumer.DELETE: ${err}`);
-          return res.status(400).json({ message: "Database error" });
+          return res.status(500).json({ message: "Database error" });
         }
         break;
       case "POST":
       // ---------------- POST
       default:
-        return res.status(400).json({ message: "This route does not exist" });
+        return res.status(405).json({ message: "This route does not exist" });
         break;
     }
   } else {

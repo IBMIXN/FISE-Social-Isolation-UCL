@@ -1,9 +1,6 @@
-import { useSession } from "next-auth/client";
+import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { Formik, Field } from "formik";
-
-import useSWR from "swr";
-import fetcher from "../../../../utils/fetcher";
 
 import {
   Text,
@@ -22,8 +19,11 @@ import { Container } from "../../../../components/Container";
 import { Main } from "../../../../components/Main";
 import { Footer } from "../../../../components/Footer";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
+import { useEffect, useState } from "react";
 
 const NameForm = ({ router }) => {
+  const [formError, setFormError] = useState("");
+
   function validateName(value) {
     let error = "";
     if (!value) {
@@ -74,14 +74,20 @@ const NameForm = ({ router }) => {
         }
         throw r;
       })
-      .then(({message, data}) => {
+      .then(({ message, data: contact }) => {
         setTimeout(() => {
-          router.replace(`/dashboard/consumer/${router.query.consumer_id}`);
+          router.replace(`/dashboard/contact/${contact._id}`);
           actions.setSubmitting(false);
         }, 1500);
       })
       .catch(async (err) => {
         actions.setSubmitting(false);
+        if (err.status === 400) {
+          return await err.json().then((rJson) => {
+            setFormError(rJson.message);
+            return;
+          });
+        }
         if (err instanceof Error) {
           throw err;
         }
@@ -148,6 +154,7 @@ const NameForm = ({ router }) => {
             </Field>
           </FormControl>
 
+          {formError && <Text color="crimson">{formError}</Text>}
           <Button
             mt={4}
             variantColor="blue"
@@ -162,44 +169,63 @@ const NameForm = ({ router }) => {
   );
 };
 
-const NewContactPage = () => {
-  const [session, loading] = useSession();
+const NewContactPage = ({ data, session }) => {
   const router = useRouter();
 
-  const { consumer_id } = router.query;
-  const { data, error } = useSWR(
-    consumer_id && `/api/consumer/${consumer_id}`,
-    fetcher
-  );
+  useEffect(() => {
+    if (!session) router.replace("/");
+    if (data && !data.name) router.replace("/onboarding");
+  }, []);
 
-  if (session && data) {
-    return (
-      <Container>
-        <Nav />
-        <Main>
-          <Breadcrumbs
-            links={[
-              ["Dashboard", "/dashboard"],
-              ["User", `/dashboard/consumer/${consumer_id}`],
-              ["New Contact", "#"],
-            ]}
-          />
-          <Heading>Create a New Contact for {data.name}</Heading>
-          <Text>
-            {data.name} will be able to call this person in the FISE Lounge app{" "}
-            <br /> (If you haven't already, you will need to add yourself as a
-            contact too).
-          </Text>
-          <NameForm router={router} />
-        </Main>
-        <Footer />
-      </Container>
-    );
-  } else if ((!loading && !session) || error) {
-    if (error) console.error(error);
-    router.replace("/");
-    return <p>Unauthorized Route: {error && JSON.stringify(error)}</p>;
-  } else return <Loading />;
+  const { consumer_id } = router.query;
+
+  return session && data ? (
+    <Container>
+      <Nav />
+      <Main>
+        <Breadcrumbs
+          links={[
+            ["Dashboard", "/dashboard"],
+            ["User", `/dashboard/consumer/${consumer_id}`],
+            ["New Contact", "#"],
+          ]}
+        />
+        <Heading>Create a New Contact for {data.name}</Heading>
+        <Text>
+          {data.name} will be able to call this person in the FISE Lounge app{" "}
+          <br /> (If you haven't already, you will need to add yourself as a
+          contact too).
+        </Text>
+        <NameForm router={router} />
+      </Main>
+      <Footer />
+    </Container>
+  ) : (
+    <Loading />
+  );
 };
 
 export default NewContactPage;
+
+export async function getServerSideProps(context) {
+  const { consumer_id } = context.params;
+  const session = await getSession(context);
+  let data = null;
+
+  if (session) {
+    const hostname = process.env.NEXTAUTH_URL;
+    const options = { headers: { cookie: context.req.headers.cookie } };
+    const res = await fetch(`${hostname}/api/consumer/${consumer_id}`, options);
+    const json = await res.json();
+    if (json.data) {
+      data = json.data;
+    }
+  }
+
+  return {
+    props: {
+      session,
+      data,
+    },
+  };
+}
