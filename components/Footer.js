@@ -7,6 +7,9 @@ export const Footer = (props) => (
     direction="column"
     justify="center"
     align="center"
+    bg="gray.800"
+    w="100vw"
+    overflowX="hidden"
     {...props}
   >
     <Text textAlign="center">by Adam Peace, Emil Almazov, Rikaz Rameez</Text>

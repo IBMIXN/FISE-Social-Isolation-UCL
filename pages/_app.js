@@ -2,6 +2,7 @@ import { Provider } from "next-auth/client";
 import { ThemeProvider, CSSReset, DarkMode } from "@chakra-ui/core";
 
 import theme from "../theme";
+import "../utils/global.css";
 
 const App = ({ Component, pageProps }) => {
   const { session } = pageProps;

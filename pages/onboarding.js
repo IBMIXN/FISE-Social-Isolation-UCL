@@ -131,7 +131,7 @@ const OnboardingPage = () => {
     }
   } else if (!loading && !session) {
     router.replace("/");
-    return <p>Unauthorized Route: {error && error}</p>;
+    return <p>Unauthorized Route: {error && JSON.stringify(error)}</p>;
   } else return <Loading />;
 };
 

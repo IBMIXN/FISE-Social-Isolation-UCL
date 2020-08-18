@@ -316,7 +316,7 @@ const ConsumerPage = () => {
   } else if ((!loading && !session) || error) {
     if (error) console.error(error);
     router.replace("/");
-    return <p>Unauthorized Route: {error && error}</p>;
+    return <p>Unauthorized Route: {error && JSON.stringify(error)}</p>;
   } else return <Loading />;
 };
 
