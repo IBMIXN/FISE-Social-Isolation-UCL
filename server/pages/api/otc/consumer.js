@@ -1,4 +1,4 @@
-// Admin User Routes
+// Otc Routes
 
 import { connectToDatabase } from "../../../utils/mongodb";
 import nodemailer from "nodemailer";
@@ -23,8 +23,6 @@ const handler = async (req, res) => {
         return c.otc === otc;
       }) != -1
   );
-
-  console.log('T', rawOtc, otc, users);
 
   if (!user)
     return res.status(403).json({ msg: "You don't have access to this page" });
