@@ -55,7 +55,7 @@ const NameForm = ({ router }) => {
         throw r;
       })
       .then(({ message, data: consumer }) => {
-        router.replace(`/consumer/${consumer._id}`);
+        router.replace(`/dashboard/consumer/${consumer._id}`);
         actions.setSubmitting(false);
       })
       .catch(async (err) => {
