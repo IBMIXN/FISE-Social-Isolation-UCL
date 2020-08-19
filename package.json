@@ -1,0 +1,28 @@
+{
+  "name": "next-auth-example",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@chakra-ui/core": "^0.8.0",
+    "@emotion/core": "^10.0.34",
+    "@emotion/styled": "^10.0.27",
+    "connect-mongo": "^3.2.0",
+    "emotion-theming": "^10.0.27",
+    "formik": "^2.1.5",
+    "mongodb": "^3.6.0",
+    "next": "latest",
+    "next-auth": "^3.1.0",
+    "node-uuid": "^1.4.8",
+    "nodemailer": "^6.4.11",
+    "random-words": "^1.1.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "sqlite3": "^4.2.0",
+    "swr": "^0.3.0"
+  }
+}
