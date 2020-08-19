@@ -24,6 +24,8 @@ const handler = async (req, res) => {
       }) != -1
   );
 
+  console.log('T', rawOtc, otc, users);
+
   if (!user)
     return res.status(403).json({ msg: "You don't have access to this page" });
 
