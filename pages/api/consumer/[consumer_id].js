@@ -58,7 +58,7 @@ const handler = async (req, res) => {
             .json({ message: "Consumer updated successfully", data: {...consumer, consumer_id} });
         } catch (err) {
           console.error(`api.consumer.PUT: ${err}`);
-          return res.status(500).json({ message: "Database error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       // ---------------- DELETE
@@ -73,7 +73,7 @@ const handler = async (req, res) => {
             .json({ message: "Consumer Deleted successfully" });
         } catch (err) {
           console.error(`api.consumer.DELETE: ${err}`);
-          return res.status(500).json({ message: "Database error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "POST":
