@@ -92,7 +92,7 @@ const handler = async (req, res) => {
           });
         } catch (err) {
           console.error(`api.contact.PUT: ${err}`);
-          return res.status(500).json({ message: "Database error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       // ---------------- DELETE
@@ -106,7 +106,7 @@ const handler = async (req, res) => {
           });
         } catch (err) {
           console.error(`api.contact.DELETE: ${err}`);
-          return res.status(500).json({ message: "Database error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "POST":

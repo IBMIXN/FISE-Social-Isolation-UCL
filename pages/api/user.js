@@ -28,7 +28,7 @@ const handler = async (req, res) => {
           }
         } catch (err) {
           console.error(`api.user.GET: ${err}`);
-          return res.status(500).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Uncaught Server Error" });
         }
         break;
       case "POST":
@@ -45,7 +45,7 @@ const handler = async (req, res) => {
           return res.status(200).json({ msg: "Updated successfully" });
         } catch (err) {
           console.error(`api.user.POST: ${err}`);
-          return res.status(500).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Uncaught Server Error" });
         }
         break;
       case "PUT":
@@ -59,7 +59,7 @@ const handler = async (req, res) => {
           return res.status(200).json({ msg: "Updated successfully" });
         } catch (err) {
           console.error(`api.user.PUT: ${err}`);
-          return res.status(500).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Uncaught Server Error" });
         }
         break;
       // ---------------- DELETE
@@ -69,7 +69,7 @@ const handler = async (req, res) => {
           return res.status(200).json({ msg: "Deleted successfully" });
         } catch (err) {
           console.error(`api.user.DELETE: ${err}`);
-          return res.status(500).json({ msg: "Database error" });
+          return res.status(500).json({ msg: "Uncaught Server Error" });
         }
         break;
 

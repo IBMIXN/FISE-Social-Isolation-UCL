@@ -43,7 +43,7 @@ const handler = async (req, res) => {
             .json({ message: "Consumer added successfully", data: consumer });
         } catch (err) {
           console.error(`api.consumer.POST: ${err}`);
-          return res.status(500).json({ message: "Database error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "GET":
