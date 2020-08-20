@@ -24,11 +24,11 @@ const handler = async (req, res) => {
         try {
           const user = await users.findOne({ email: email });
           if (user) {
-            return res.status(200).json({ msg: "Data found", data: user });
+            return res.status(200).json({ message: "Data found", data: user });
           }
         } catch (err) {
           console.error(`api.user.GET: ${err}`);
-          return res.status(500).json({ msg: "Uncaught Server Error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "POST":
@@ -42,10 +42,10 @@ const handler = async (req, res) => {
           user.name = name;
           await users.updateOne({ email }, { $set: user });
           // if (!user) return res.status(400).json({ success: false });
-          return res.status(200).json({ msg: "Updated successfully" });
+          return res.status(200).json({ message: "Updated successfully" });
         } catch (err) {
           console.error(`api.user.POST: ${err}`);
-          return res.status(500).json({ msg: "Uncaught Server Error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "PUT":
@@ -56,29 +56,29 @@ const handler = async (req, res) => {
           );
           await users.updateOne({ email }, { $set: updates });
           // if (!user) return res.status(400).json({ success: false });
-          return res.status(200).json({ msg: "Updated successfully" });
+          return res.status(200).json({ message: "Updated successfully" });
         } catch (err) {
           console.error(`api.user.PUT: ${err}`);
-          return res.status(500).json({ msg: "Uncaught Server Error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       // ---------------- DELETE
       case "DELETE":
         try {
           await users.deleteOne({ email });
-          return res.status(200).json({ msg: "Deleted successfully" });
+          return res.status(200).json({ message: "Deleted successfully" });
         } catch (err) {
           console.error(`api.user.DELETE: ${err}`);
-          return res.status(500).json({ msg: "Uncaught Server Error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
 
       default:
-        return res.status(405).json({ msg: "This route does not exist" });
+        return res.status(405).json({ message: "This route does not exist" });
         break;
     }
   } else {
-    return res.status(403).json({ msg: "You don't have access to this page" });
+    return res.status(403).json({ message: "You don't have access to this page" });
   }
 };
 

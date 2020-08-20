@@ -1,16 +1,39 @@
 // Otc Routes
 
-import { connectToDatabase } from "../../../utils/mongodb";
+import Cors from "cors";
 import nodemailer from "nodemailer";
+import { connectToDatabase } from "../../../utils/mongodb";
+
+const cors = Cors({
+  methods: ["GET", "HEAD", "POST"],
+});
+
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+
+      return resolve(result);
+    });
+  });
+}
 
 const handler = async (req, res) => {
-  const { body, method } = req;
-  const { otc: rawOtc } = body;
+  // Run the middleware
+  await runMiddleware(req, res, cors);
+
+  const { body, method, query } = req;
+  const { otc: rawOtc } = query;
+
+  console.log(rawOtc);
 
   const otc = rawOtc
     .trim()
     .split(/[\s-]+/)
-    .join("-");
+    .join("")
+    .toLowerCase();
 
   const { client } = await connectToDatabase();
   const db = await client.db(process.env.MONGODB_DB);
@@ -20,24 +43,26 @@ const handler = async (req, res) => {
   const user = users.find(
     (u) =>
       u.consumers.findIndex((c) => {
-        return c.otc === otc;
+        return c.otc.split("-").join("") === otc;
       }) != -1
   );
 
   if (!user)
-    return res.status(403).json({ msg: "You don't have access to this page" });
+    return res.status(403).json({ message: "You don't have access to this page" });
 
-  const consumer = user.consumers.find((c) => c.otc === otc);
+  const consumer = user.consumers.find(
+    (c) => c.otc.split("-").join("") === otc
+  );
 
   if (consumer) {
     switch (method) {
       case "GET":
         // ---------------- GET
         try {
-          return res.status(200).json({ msg: "Data found", data: consumer });
+          return res.status(200).json({ message: "Data found", data: consumer });
         } catch (err) {
           console.error(`api.otc.consumer.GET: ${err}`);
-          return res.status(500).json({ msg: "Uncaught Server Error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "POST":
@@ -45,11 +70,11 @@ const handler = async (req, res) => {
         try {
           const { contact_id } = body;
           if (!contact_id)
-            return res.status(400).json({ msg: "Missing Params" });
+            return res.status(400).json({ message: "Missing Params" });
 
           const contact = consumer.contacts.find((c) => c._id === contact_id);
 
-          if (!contact) return res.status(400).json({ msg: "Missing Params" });
+          if (!contact) return res.status(400).json({ message: "Missing Params" });
 
           let transporter = nodemailer.createTransport(
             process.env.EMAIL_SERVER
@@ -65,10 +90,10 @@ const handler = async (req, res) => {
 
           transporter.sendMail(message);
 
-          return res.status(200).json({ msg: "Invite Sent successfully" });
+          return res.status(200).json({ message: "Invite Sent successfully" });
         } catch (err) {
           console.error(`api.otc.consumer.POST: ${err}`);
-          return res.status(500).json({ msg: "Uncaught Server Error" });
+          return res.status(500).json({ message: "Uncaught Server Error" });
         }
         break;
       case "PUT":
@@ -76,11 +101,11 @@ const handler = async (req, res) => {
       case "DELETE":
       // ---------------- DELETE
       default:
-        return res.status(405).json({ msg: "This route does not exist" });
+        return res.status(405).json({ message: "This route does not exist" });
         break;
     }
   } else {
-    return res.status(403).json({ msg: "You don't have access to this page" });
+    return res.status(403).json({ message: "You don't have access to this page" });
   }
 };
 
