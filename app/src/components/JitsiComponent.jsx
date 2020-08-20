@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { jsx, css } from "@emotion/core";
 import { useJitsi } from "react-jutsu";
 
-const domain = "alpha.jitsi.net";
+const domain = process.env.REACT_APP_JITSI_URL;
 
 const configOverwrite = {
   disableDeepLinking: true,
@@ -31,8 +31,8 @@ const interfaceConfigOverwrite = {
   INITIAL_TOOLBAR_TIMEOUT: 200000,
   TOOLBAR_ALWAYS_VISIBLE: true,
   TOOLBAR_BUTTONS: [
-    //   'microphone',
-    //   'camera',
+      // 'microphone',
+      // 'camera',
     // "hangup",
   ],
   TOOLBAR_TIMEOUT: 5000,
@@ -56,7 +56,7 @@ const JitsiComponent = (props) => {
 
   const options = {
     userInfo: {
-      displayName: "Grannie",
+      displayName,
     },
     password: password || "",
   };
