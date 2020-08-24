@@ -13,7 +13,7 @@ const configOverwrite = {
 };
 
 const interfaceConfigOverwrite = {
-  APP_NAME: "FISE Plaza",
+  APP_NAME: "FISE Lounge",
   SHOW_POWERED_BY: false,
   SHOW_PROMOTIONAL_CLOSE_PAGE: false,
   MOBILE_APP_PROMO: false,
@@ -50,7 +50,7 @@ const JitsiComponent = (props) => {
     containerStyles,
   } = props;
 
-  const subject = "FISE Plaza";
+  const subject = "FISE Lounge";
 
   const [loading, setLoading] = useState(true);
 

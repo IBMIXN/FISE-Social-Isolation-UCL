@@ -12,16 +12,14 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CSSReset />
       <Router>
-        <div>
-          <Switch>
-            <Route path="/onboarding">
-              <Onboarding />
-            </Route>
-            <Route path="/">
-              <Main />
-            </Route>
-          </Switch>
-        </div>
+        <Switch>
+          <Route path="/onboarding">
+            <Onboarding />
+          </Route>
+          <Route path="/">
+            <Main />
+          </Route>
+        </Switch>
       </Router>
     </ThemeProvider>
   );
