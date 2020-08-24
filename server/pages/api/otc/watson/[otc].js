@@ -1,4 +1,4 @@
-// Otc Routes
+// Watson Routes
 
 import Cors from "cors";
 import nodemailer from "nodemailer";
@@ -48,8 +48,6 @@ const handler = async (req, res) => {
 
   const { body, method, query } = req;
   const { otc: rawOtc } = query;
-
-  console.log(rawOtc);
 
   const otc = rawOtc
     .trim()
@@ -106,9 +104,11 @@ const handler = async (req, res) => {
                 })
                 .then((result) => {
                   assistantResult = result.result.output;
-                  if (assistantResult.intents.length == 0){
+                  if (assistantResult.intents.length == 0) {
                     console.log("Couldn't recognize intent");
-                    return res.status(500).json("Watson couldn't recognize intents")
+                    return res
+                      .status(500)
+                      .json("Watson couldn't recognize intents");
                   }
                   // parse assistant result to return correct action and data
                   const userIntent = assistantResult.intents[0].intent;
@@ -120,7 +120,8 @@ const handler = async (req, res) => {
                         data: consumer.contacts.find(
                           (contact) =>
                             contact.name.toLowerCase() === contactToCall ||
-                            relations[contact.relation].toLowerCase() == contactToCall
+                            relations[contact.relation].toLowerCase() ==
+                              contactToCall
                         ),
                       });
                       break;
@@ -142,9 +143,8 @@ const handler = async (req, res) => {
                 })
                 .catch((err) => {
                   console.log(err);
-                  return res.status(500).json(err)
+                  return res.status(500).json({ message: "Uncaught Server Error" });
                 });
-                
             })
             .catch((err) => {
               console.log(err);

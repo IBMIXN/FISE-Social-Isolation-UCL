@@ -27,8 +27,6 @@ const handler = async (req, res) => {
   const { body, method, query } = req;
   const { otc: rawOtc } = query;
 
-  console.log(rawOtc);
-
   const otc = rawOtc
     .trim()
     .split(/[\s-]+/)
