@@ -63,7 +63,7 @@ const handler = async (req, res) => {
           console.error(`api.contact.POST: ${err}`);
           return res
             .status(500)
-            .json({ msg: `Uncaught Server Error: ${err.message}` });
+            .json({ message: `Uncaught Server Error: ${err.message}` });
         }
         break;
       case "GET":
