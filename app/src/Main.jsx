@@ -7,13 +7,7 @@ import "aframe-particle-system-component";
 import { Entity, Scene } from "aframe-react";
 import { Helmet } from "react-helmet";
 import JitsiComponent from "./components/JitsiComponent";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSyncAlt } from "@fortawesome/free-solid-svg-icons";
-
-import Contact from "./components/Contact";
-
-import profile1 from "./assets/profile1.jpeg";
+import MicComponent from "./components/MicComponent";
 
 import img1 from "./assets/img1.jpg";
 import img2 from "./assets/img2.jpg";
@@ -22,78 +16,15 @@ import img4 from "./assets/img4.jpg";
 import { Redirect } from "react-router-dom";
 import { Box, Icon, Image, Stack, Text } from "@chakra-ui/core";
 
-const resetStyle = css`
-  outline: none;
-  border: none;
-  background: none;
-  border-radius: 100%;
-  :hover {
-    cursor: pointer;
-  }
-`;
-
-const buttonContainerStyle = css`
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 30%;
-  display: grid;
-  grid-template-columns:
-    5em [left] repeat(3, auto [button-l] 11em [button-r] auto)
-    [right] 5em;
-  grid-template-rows: [top] auto [bottom] 10%;
-`;
-
-const buttonStyle = css`
-  border-radius: 4em;
-  background-color: #3d4055f0;
-  color: #fff;
-  padding-left: 1em;
-  padding-right: 1em;
-  border: none;
-  width: 100%;
-
-  :hover {
-    cursor: pointer;
-    background-color: #3d4055e0;
-  }
-
-  :focus {
-    outline: 0;
-    background-color: #3d4055e6;
-  }
-`;
-
-const cornerButtonStyle = css`
-  outline: none;
-  border: none;
-  background: none;
-
-  position: absolute;
-  z-index: 5;
-  left: 0;
-  top: 0;
-  width: 8em;
-  height: 8em;
-  border-bottom-right-radius: 10em;
-  background: #3d4055f0;
-
-  :hover {
-    cursor: pointer;
-    background-color: #3d4055e0;
-  }
-`;
 function Main() {
   const scenes = [img1, img2, img3, img4];
   const [room, setRoom] = useState("");
   const [call, setCall] = useState(false);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
 
+  // const user = {"_id":"7c785ed8-5666-4ea4-b30c-d16baa3feed3","name":"Jim","isCloudEnabled":"true","otc":"probably-prepare-pay","ar_scenes":[],"contacts":[{"_id":"7c9c0aee-70af-44e1-b343-d177219e40a3","name":"Sandra","email":"leads2020@alphabetiq.com","relation":1,"profileImage":""}]}
   const user = JSON.parse(localStorage.getItem("user"));
   if (!user) return <Redirect to="/onboarding" />;
-
-  console.log(process.env.REACT_APP_JITSI_URL);
 
   const handleChangeScene = () => {
     setCurrentSceneIndex((currentSceneIndex + 1) % scenes.length);
@@ -224,6 +155,7 @@ function Main() {
                 </button>
               ))}
             </Stack>
+            <MicComponent />
           </Box>
         )}
 

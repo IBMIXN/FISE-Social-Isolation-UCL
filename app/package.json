@@ -17,6 +17,7 @@
     "aframe-react": "^4.4.0",
     "emotion-theming": "^10.0.27",
     "formik": "^2.1.5",
+    "mic-recorder-to-mp3": "^2.2.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-helmet": "^6.0.0",
