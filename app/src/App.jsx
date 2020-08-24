@@ -13,16 +13,6 @@ export default function App() {
       <CSSReset />
       <Router>
         <div>
-          <nav>
-            <ul>
-              <li>
-                <Link to="/">Home</Link>
-              </li>
-              <li>
-                <Link to="/onboarding">Onboarding</Link>
-              </li>
-            </ul>
-          </nav>
           <Switch>
             <Route path="/onboarding">
               <Onboarding />

@@ -224,7 +224,7 @@ function Main() {
                 </button>
               ))}
             </Stack>
-            <audio src={blobURL} controls="controls" />
+            {blobURL && <audio src={blobURL} controls="controls" />}
           </Box>
         )}
       </div>

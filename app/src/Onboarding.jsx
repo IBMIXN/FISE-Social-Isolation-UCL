@@ -2,16 +2,22 @@ import React from "react";
 import { Redirect } from "react-router-dom";
 import { Formik, Field } from "formik";
 import {
+  Flex,
   Text,
   Heading,
+  Stack,
   FormErrorMessage,
   FormLabel,
+  Link as ChakraLink,
   FormControl,
   Input,
   Button,
+  Box,
 } from "@chakra-ui/core";
 import { useState } from "react";
 import { useEffect } from "react";
+
+import Footer from "./components/Footer";
 
 // THIS FOR POST REQUEST
 // const contact_id = "7c9c0aee-70af-44e1-b343-d177219e40a3";
@@ -52,22 +58,17 @@ import { useEffect } from "react";
 
 function Onboarding() {
   const [userIsValid, setUserIsValid] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (localStorage.getItem("user")) setUserIsValid(true);
   }, []);
 
-  console.log(process.env.REACT_APP_SERVER_URL);
   function validateOtc(value) {
     let error = "";
     if (!value) {
       error = "Required";
     }
-    // else if (value.length > 15) {
-    //   error = "Must be 15 characters or less";
-    // } else if (!/^[a-z]+$/i.test(value)) {
-    //   error = "Invalid characters, we only want your first otc!";
-    // }
     return error;
   }
 
@@ -92,6 +93,9 @@ function Onboarding() {
         if (err instanceof Error) {
           throw err;
         }
+        if (err.status === 403) {
+          setError("You entered an invalid one-time-code.");
+        }
         throw await err.json().then((rJson) => {
           console.error(
             `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
@@ -102,40 +106,71 @@ function Onboarding() {
   };
 
   return (
-    <div>
-      {userIsValid && <Redirect to="/" />}
-      <Formik initialValues={{ otc: "" }} onSubmit={handleFormSubmit}>
-        {({
-          isSubmitting,
-          getFieldProps,
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <Field name="otc" validate={validateOtc}>
-              {({ field, form }) => (
-                <FormControl isInvalid={form.errors.otc && form.touched.otc}>
-                  <FormLabel htmlFor="otc">First otc</FormLabel>
-                  <Input {...field} id="otc" placeholder="One-time-code" />
-                  <FormErrorMessage>{form.errors.otc}</FormErrorMessage>
-                </FormControl>
-              )}
-            </Field>
+    <Flex direction="column" alignItems="center" justifyContent="flex-start">
+      <Stack justifyContent="center" alignItems="center" height="25vh">
+        <Heading fontSize="5vw">Welcome to FISE Lounge</Heading>
+        {userIsValid && <Redirect to="/" />}
+      </Stack>
+      <Box>
+        <Formik initialValues={{ otc: "" }} onSubmit={handleFormSubmit}>
+          {({
+            isSubmitting,
+            getFieldProps,
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <Field name="otc" validate={validateOtc}>
+                {({ field, form }) => (
+                  <FormControl
+                    isInvalid={(form.errors.otc || error) && form.touched.otc}
+                  >
+                    <FormLabel htmlFor="otc" fontSize="1.5rem">
+                      Please enter the one-time-code you were given.
+                    </FormLabel>
+                    <Input {...field} id="otc" placeholder="One-time-code" size="lg" />
+                    <FormErrorMessage>
+                      {error || form.errors.otc}
+                    </FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
 
-            <Button
-              mt={4}
-              variantColor="blue"
-              isLoading={isSubmitting}
-              type="submit"
-            >
-              Save Changes
-            </Button>
-          </form>
-        )}
-      </Formik>
-    </div>
+              <Button
+                mt={4}
+                variantColor="green"
+                isLoading={isSubmitting}
+                type="submit"
+                size="lg"
+              >
+                Enter App
+              </Button>
+            </form>
+          )}
+        </Formik>
+      </Box>
+      <Stack spacing="1.5rem" width="100%" maxWidth="48rem" py="8rem" px="1rem">
+        <Text fontSize="1.5rem">
+          If you have been told to enter a three word code, please enter it
+          above and press "Enter App".
+        </Text>
+        <Text color="gray.500">
+          Otherwise, please sign up for FISE Lounge at{" "}
+          <ChakraLink
+            color="blue.600"
+            textDecoration="underline"
+            href="https://fise.ml"
+          >
+            fise.ml
+          </ChakraLink>{" "}
+          and return here when you have created a user and received a
+          one-time-code.
+        </Text>
+      </Stack>
+      <Footer />
+    </Flex>
   );
 }
 
