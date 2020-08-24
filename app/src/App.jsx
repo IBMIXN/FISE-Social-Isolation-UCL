@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
 import theme from "./theme";
 import { ThemeProvider, CSSReset } from "@chakra-ui/core";
@@ -13,6 +13,9 @@ export default function App() {
       <CSSReset />
       <Router>
         <Switch>
+          <Route path="/logout">
+            <Logout />
+          </Route>
           <Route path="/onboarding">
             <Onboarding />
           </Route>
@@ -24,3 +27,9 @@ export default function App() {
     </ThemeProvider>
   );
 }
+
+const Logout = () => {
+  localStorage.setItem("otc", "");
+  localStorage.setItem("user", "");
+  return <Redirect to="/onboarding" />;
+};

@@ -130,7 +130,14 @@ function Onboarding() {
                     <FormLabel htmlFor="otc" fontSize="1.5rem">
                       Please enter the one-time-code you were given.
                     </FormLabel>
-                    <Input {...field} id="otc" placeholder="One-time-code" size="lg" />
+                    <Input
+                      {...field}
+                      id="otc"
+                      name="otc"
+                      placeholder="One-time-code"
+                      autocomplete="no"
+                      size="lg"
+                    />
                     <FormErrorMessage>
                       {error || form.errors.otc}
                     </FormErrorMessage>
