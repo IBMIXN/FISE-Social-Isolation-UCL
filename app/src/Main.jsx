@@ -6,8 +6,10 @@ import "aframe";
 import "aframe-particle-system-component";
 import { Entity, Scene } from "aframe-react";
 import { Helmet } from "react-helmet";
+
+import MicRecorder from "mic-recorder-to-mp3";
+
 import JitsiComponent from "./components/JitsiComponent";
-import MicComponent from "./components/MicComponent";
 
 import img1 from "./assets/img1.jpg";
 import img2 from "./assets/img2.jpg";
@@ -16,11 +18,31 @@ import img4 from "./assets/img4.jpg";
 import { Redirect } from "react-router-dom";
 import { Box, Icon, Image, Stack, Text } from "@chakra-ui/core";
 
+const Mp3Recorder = new MicRecorder({ bitRate: 128 });
+
 function Main() {
   const scenes = [img1, img2, img3, img4];
   const [room, setRoom] = useState("");
   const [call, setCall] = useState(false);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
+
+  const [isMicrophoneRecording, setIsMicrophoneRecording] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blobURL, setBlobURL] = useState("");
+
+  useEffect(() => {
+    navigator.mediaDevices.getUserMedia(
+      { audio: true },
+      () => {
+        console.log("Permission Granted");
+        setIsBlocked(false);
+      },
+      () => {
+        console.log("Permission Denied");
+        setIsBlocked(true);
+      }
+    );
+  }, []);
 
   // const user = {"_id":"7c785ed8-5666-4ea4-b30c-d16baa3feed3","name":"Jim","isCloudEnabled":"true","otc":"probably-prepare-pay","ar_scenes":[],"contacts":[{"_id":"7c9c0aee-70af-44e1-b343-d177219e40a3","name":"Sandra","email":"leads2020@alphabetiq.com","relation":1,"profileImage":""}]}
   const user = JSON.parse(localStorage.getItem("user"));
@@ -29,6 +51,31 @@ function Main() {
   const handleChangeScene = () => {
     setCurrentSceneIndex((currentSceneIndex + 1) % scenes.length);
     console.log(currentSceneIndex);
+  };
+
+  const handleMicrophoneClick = async (e) => {
+    if (isMicrophoneRecording) {
+      // End recording
+      Mp3Recorder.stop()
+        .getMp3()
+        .then(([buffer, blob]) => {
+          const blobURL = URL.createObjectURL(blob);
+          setBlobURL(blobURL);
+          setIsMicrophoneRecording(false);
+        })
+        .catch((e) => console.log(e));
+    } else {
+      // Begin recording
+      if (isBlocked) {
+        console.log("Permission Denied");
+      } else {
+        Mp3Recorder.start()
+          .then(() => {
+            setIsMicrophoneRecording(true);
+          })
+          .catch((e) => console.error(e));
+      }
+    }
   };
 
   const handleAvatarClick = async (contact_id) => {
@@ -107,7 +154,7 @@ function Main() {
           />
         </Scene>
         {scenes.length > 1 && (
-          <button onClick={() => handleChangeScene()}>
+          <button onClick={handleChangeScene}>
             <Box
               pos="absolute"
               top="0"
@@ -119,7 +166,29 @@ function Main() {
               pl="0.5rem"
               roundedBottomRight="70%"
             >
-              <Icon name="repeat" size="5rem" color="white" />
+              <Icon color="white" name="repeat" size="4rem" m="1rem" />
+            </Box>
+          </button>
+        )}
+        {user.isCloudEnabled === "true" && (
+          <button onClick={handleMicrophoneClick}>
+            <Box
+              pos="absolute"
+              top="0"
+              right="0"
+              bg="gray.600"
+              pr="1rem"
+              pb="1rem"
+              pt="0.5rem"
+              pl="0.5rem"
+              roundedBottomLeft="70%"
+            >
+              <Icon
+                name="microphone"
+                size="4rem"
+                m="1rem"
+                color={isMicrophoneRecording ? "red.500" : "white"}
+              />
             </Box>
           </button>
         )}
@@ -155,42 +224,9 @@ function Main() {
                 </button>
               ))}
             </Stack>
-            <MicComponent />
+            <audio src={blobURL} controls="controls" />
           </Box>
         )}
-
-        {/* <div css={buttonContainerStyle}>
-          <div
-            style={{
-              gridColumn: "button-l 1 / button-r 1",
-              gridRow: "top /bottom",
-            }}
-          >
-            <button css={resetStyle} onClick={handleAvatarClick}>
-              <Contact src={profile1} />
-            </button>
-          </div>
-          <div
-            style={{
-              gridColumn: "button-l 2 / button-r 2",
-              gridRow: "top /bottom",
-            }}
-          >
-            <button css={resetStyle} onClick={handleAvatarClick}>
-              <Contact src={profile1} />
-            </button>
-          </div>
-          <div
-            style={{
-              gridColumn: "button-l 3 / button-r 3",
-              gridRow: "top /bottom",
-            }}
-          >
-            <button css={resetStyle} onClick={handleAvatarClick}>
-              <Contact src={profile1} />
-            </button>
-          </div>
-        </div> */}
       </div>
     </>
   );
