@@ -1,5 +1,6 @@
 /** @jsx jsx */
 /** @jsxFrag React.Fragment */
+// eslint-disable-next-line
 import React, { useEffect, useState } from "react";
 import { jsx, css } from "@emotion/core";
 import "aframe";
@@ -44,7 +45,6 @@ function Main() {
     );
   }, []);
 
-  // const user = {"_id":"7c785ed8-5666-4ea4-b30c-d16baa3feed3","name":"Jim","isCloudEnabled":"true","otc":"probably-prepare-pay","ar_scenes":[],"contacts":[{"_id":"7c9c0aee-70af-44e1-b343-d177219e40a3","name":"Sandra","email":"leads2020@alphabetiq.com","relation":1,"profileImage":""}]}
   const user = JSON.parse(localStorage.getItem("user"));
   if (!user) return <Redirect to="/onboarding" />;
 

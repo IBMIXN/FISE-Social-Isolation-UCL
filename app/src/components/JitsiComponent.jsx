@@ -1,7 +1,4 @@
-/** @jsx jsx */
-/** @jsxFrag React.Fragment */
 import React, { useEffect, useState } from "react";
-import { jsx, css } from "@emotion/core";
 import { useJitsi } from "react-jutsu";
 
 const domain = process.env.REACT_APP_JITSI_URL;
@@ -31,8 +28,8 @@ const interfaceConfigOverwrite = {
   INITIAL_TOOLBAR_TIMEOUT: 200000,
   TOOLBAR_ALWAYS_VISIBLE: true,
   TOOLBAR_BUTTONS: [
-      // 'microphone',
-      // 'camera',
+    // 'microphone',
+    // 'camera',
     // "hangup",
   ],
   TOOLBAR_TIMEOUT: 5000,
@@ -88,24 +85,25 @@ const JitsiComponent = (props) => {
     if (jitsi) {
       jitsi.executeCommand("subject", subject);
 
-      jitsi.addEventListener("participantRoleChanged", function (event) {
-        if (event.role === "moderator") {
-          jitsi.executeCommand("password", password);
-        }
-      });
+      // jitsi.addEventListener("participantRoleChanged", function (event) {
+      //   if (event.role === "moderator") {
+      //     jitsi.executeCommand("password", password);
+      //   }
+      // });
 
-      jitsi.addEventListener("passwordRequired", () => {
-        if (password) {
-          jitsi.executeCommand("password", password);
-        }
-      });
+      // jitsi.addEventListener("passwordRequired", () => {
+      //   if (password) {
+      //     jitsi.executeCommand("password", password);
+      //   }
+      // });
+      
       setLoading(false);
 
       if (onMeetingEnd) jitsi.addEventListener("readyToClose", onMeetingEnd);
     }
 
     return () => jitsi && jitsi.dispose();
-  }, [jitsi]);
+  }, [jitsi, onMeetingEnd]);
 
   return (
     <div style={{ ...containerStyle, ...containerStyles }}>
