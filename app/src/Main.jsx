@@ -70,6 +70,11 @@ function Main() {
           if (err instanceof Error) {
             throw err;
           }
+          if (err.status === 403) {
+            localStorage.setItem("user", "");
+            localStorage.setItem("otc", "");
+            return;
+          }
           throw await err.json().then((rJson) => {
             console.error(
               `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
@@ -81,8 +86,10 @@ function Main() {
     fetchUserData();
   }, []);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  if (!user) return <Redirect to="/onboarding" />;
+
+  const rawUser = localStorage.getItem("user");
+  if (!rawUser) return <Redirect to="/onboarding" />;
+  const user = JSON.parse(rawUser)
 
   const handleChangeScene = () => {
     setCurrentSceneIndex((currentSceneIndex + 1) % scenes.length);
