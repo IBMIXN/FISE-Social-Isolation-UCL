@@ -1,7 +1,6 @@
 // Otc Routes
 
 import Cors from "cors";
-import nodemailer from "nodemailer";
 import AssistantV2 from "ibm-watson/assistant/v2";
 import SpeechToTextV1 from "ibm-watson/speech-to-text/v1";
 import { IamAuthenticator } from "ibm-watson/auth";
@@ -87,72 +86,62 @@ const handler = async (req, res) => {
             message_type: "text",
             text: "",
           };
-          var assistantResult;
           const recognizeParams = {
             audio: new Buffer(body, "base64"),
             contentType: "audio/mp3",
           };
           // call stt api with the audio in request and add this to assistant input
-          stt
-            .recognize(recognizeParams)
-            .then((result) => {
-              assistantInput.text =
-                result.result.results[0].alternatives[0].transcript;
-              // call assistant api with input from stt and store in assistantResult
-              assistant
-                .messageStateless({
-                  assistantId: watsonId,
-                  input: assistantInput,
-                })
-                .then((result) => {
-                  assistantResult = result.result.output;
-                  if (assistantResult.intents.length == 0){
-                    console.log("Couldn't recognize intent");
-                    return res.status(500).json("Watson couldn't recognize intents")
-                  }
-                  // parse assistant result to return correct action and data
-                  const userIntent = assistantResult.intents[0].intent;
-                  switch (userIntent) {
-                    case "Call_Contact":
-                      const contactToCall = assistantResult.generic[0].text.toLowerCase();
-                      return res.json({
-                        message: "call",
-                        data: consumer.contacts.find(
-                          (contact) =>
-                            contact.name.toLowerCase() === contactToCall ||
-                            relations[contact.relation].toLowerCase() == contactToCall
-                        ),
-                      });
-                      break;
-                    case "Change_Background":
-                      return res.status(200).json({
-                        message: "changeBg",
-                        data: true,
-                      });
-                      break;
-                    case "Start_Exercise":
-                      return res.status(200).json({
-                        message: "exercise",
-                        data: true,
-                      });
-                      break;
-                    default:
-                      throw new Error("Undefined user intent");
-                  }
-                })
-                .catch((err) => {
-                  console.log(err);
-                  return res.status(500).json(err)
-                });
-                
-            })
-            .catch((err) => {
-              console.log(err);
-              return res.status(500).json({ message: "Uncaught Server Error" });
-            });
+          const result = await stt.recognize(recognizeParams);
+
+          assistantInput.text =
+            result.result.results[0].alternatives[0].transcript;
+
+          const {
+            result: rawAssistantResult,
+          } = await assistant.messageStateless({
+            assistantId: watsonId,
+            input: assistantInput,
+          });
+          const { output } = rawAssistantResult;
+
+          if (output.intents.length == 0) {
+            console.log("Couldn't recognize intent");
+            return res.status(400).json("Watson couldn't recognize intents");
+          }
+
+          const userIntent = output.intents[0].intent;
+          switch (userIntent) {
+            case "Call_Contact":
+              const contactToCall = output.generic[0].text.toLowerCase();
+              return res.json({
+                message: "call",
+                data: consumer.contacts.find(
+                  (contact) =>
+                    contact.name.toLowerCase() === contactToCall ||
+                    relations[contact.relation].toLowerCase() == contactToCall
+                ),
+              });
+              break;
+            case "Change_Background":
+              return res.status(200).json({
+                message: "changeBg",
+                data: true,
+              });
+              break;
+            case "Start_Exercise":
+              return res.status(200).json({
+                message: "exercise",
+                data: true,
+              });
+              break;
+            default:
+              throw new Error("Undefined user intent");
+          }
         } catch (err) {
-          console.error(`api.otc.consumer.POST: ${err}`);
-          return res.status(500).json({ message: "Uncaught Server Error" });
+          console.error(`api.otc.watson.POST: ${err}`);
+          return res
+            .status(500)
+            .json({ message: "Uncaught Server Error", data: err });
         }
         break;
       case "GET":
