@@ -91,51 +91,60 @@ const handler = async (req, res) => {
             audio: new Buffer(body, "base64"),
             contentType: "audio/mp3",
           };
-          // call stt api with the audio in request and add this to assistant input
-          const result = await stt.recognize(recognizeParams);
-
-          const { transcript } = result.result.results[0].alternatives[0];
-
-          assistantInput.text = transcript;
-
-          const {
-            result: { output },
-          } = await assistant.messageStateless({
-            assistantId: watsonId,
-            input: assistantInput,
-          });
 
           const data = {
             action: "",
             contact_id: "",
-            text: transcript,
+            text: "",
           };
 
-          if (output.intents[0]) {
-            const { intent } = output.intents[0];
+          // call stt api with the audio in request and add this to assistant input
+          const {
+            result: { results },
+          } = await stt.recognize(recognizeParams);
 
-            switch (intent) {
-              case "Call_Contact":
-                data.action = "startCall";
+          if (results.length) {
+            // Speech to text recognized something, continue
 
-                const contactToCall = output.generic[0].text.toLowerCase();
+            const { transcript } = results[0].alternatives[0];
 
-                const contactNames = consumer.contacts.map((c) => c.name);
-                const { bestMatchIndex } = stringSimilarity.findBestMatch(
-                  contactToCall,
-                  contactNames
-                );
-                const contact_id = consumer.contacts[bestMatchIndex]._id;
-                data.contact_id = contact_id;
-                break;
-              case "Change_Background":
-                data.action = "changeBackground";
-                break;
-              case "Start_Exercise":
-                data.action = "startExercise";
-                break;
-              default:
-                break;
+            assistantInput.text = transcript;
+
+            const {
+              result: { output },
+            } = await assistant.messageStateless({
+              assistantId: watsonId,
+              input: assistantInput,
+            });
+
+            data.text = transcript;
+
+            if (output.intents[0]) {
+              const { intent } = output.intents[0];
+
+              switch (intent) {
+                case "Call_Contact":
+                  data.action = "startCall";
+
+                  const contactToCall = output.generic[0].text.toLowerCase();
+
+                  const contactNames = consumer.contacts.map((c) => c.name);
+                  const { bestMatchIndex } = stringSimilarity.findBestMatch(
+                    contactToCall,
+                    contactNames
+                  );
+                  const contact_id = consumer.contacts[bestMatchIndex]._id;
+                  data.contact_id = contact_id;
+                  break;
+                case "Change_Background":
+                  data.action = "changeBackground";
+                  break;
+                case "Start_Exercise":
+                  data.action = "startExercise";
+                  break;
+                default:
+                  break;
+              }
             }
           }
 
