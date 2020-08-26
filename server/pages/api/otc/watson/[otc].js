@@ -5,6 +5,7 @@ import AssistantV2 from "ibm-watson/assistant/v2";
 import SpeechToTextV1 from "ibm-watson/speech-to-text/v1";
 import { IamAuthenticator } from "ibm-watson/auth";
 import { connectToDatabase } from "../../../../utils/mongodb";
+import stringSimilarity from "string-similarity";
 
 import relations from "../../../../utils/relations";
 
@@ -93,49 +94,61 @@ const handler = async (req, res) => {
           // call stt api with the audio in request and add this to assistant input
           const result = await stt.recognize(recognizeParams);
 
-          assistantInput.text =
-            result.result.results[0].alternatives[0].transcript;
+          const { transcript } = result.result.results[0].alternatives[0];
+
+          assistantInput.text = transcript;
 
           const {
-            result: rawAssistantResult,
+            result: { output },
           } = await assistant.messageStateless({
             assistantId: watsonId,
             input: assistantInput,
           });
-          const { output } = rawAssistantResult;
 
-          if (output.intents.length == 0) {
-            console.log("Couldn't recognize intent");
-            return res.status(400).json("Watson couldn't recognize intents");
+          const data = {
+            action: "",
+            contact_id: "",
+            text: transcript,
+          };
+
+          if (output.intents[0]) {
+            const { intent } = output.intents[0];
+
+            switch (intent) {
+              case "Call_Contact":
+                data.action = "startCall";
+
+                const contactToCall = output.generic[0].text.toLowerCase();
+
+                const contactNames = consumer.contacts.map((c) => c.name);
+                const { bestMatchIndex } = stringSimilarity.findBestMatch(
+                  contactToCall,
+                  contactNames
+                );
+                const contact_id = consumer.contacts[bestMatchIndex]._id;
+                data.contact_id = contact_id;
+                break;
+              case "Change_Background":
+                data.action = "changeBackground";
+                break;
+              case "Start_Exercise":
+                data.action = "startExercise";
+                break;
+              default:
+                break;
+            }
           }
 
-          const userIntent = output.intents[0].intent;
-          switch (userIntent) {
-            case "Call_Contact":
-              const contactToCall = output.generic[0].text.toLowerCase();
-              return res.json({
-                message: "call",
-                data: consumer.contacts.find(
-                  (contact) =>
-                    contact.name.toLowerCase() === contactToCall ||
-                    relations[contact.relation].toLowerCase() == contactToCall
-                ),
-              });
-              break;
-            case "Change_Background":
-              return res.status(200).json({
-                message: "changeBg",
-                data: true,
-              });
-              break;
-            case "Start_Exercise":
-              return res.status(200).json({
-                message: "exercise",
-                data: true,
-              });
-              break;
-            default:
-              throw new Error("Undefined user intent");
+          if (data.action) {
+            return res.status(200).json({
+              message: "Watson recognized your request",
+              data,
+            });
+          } else {
+            return res.status(200).json({
+              message: "Watson couldn't recognize intents",
+              data,
+            });
           }
         } catch (err) {
           console.error(`api.otc.watson.POST: ${err}`);
