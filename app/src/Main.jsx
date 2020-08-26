@@ -17,7 +17,15 @@ import img2 from "./assets/img2.jpg";
 import img3 from "./assets/img3.jpg";
 import img4 from "./assets/img4.jpg";
 import { Redirect } from "react-router-dom";
-import { Box, Icon, Image, Stack, Text, useToast } from "@chakra-ui/core";
+import {
+  Box,
+  Icon,
+  Image,
+  Stack,
+  Text,
+  useToast,
+  Spinner,
+} from "@chakra-ui/core";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -26,10 +34,8 @@ function Main() {
   const [room, setRoom] = useState("");
   const [call, setCall] = useState(false);
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
-
   const [isMicrophoneRecording, setIsMicrophoneRecording] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
-  const [blobURL, setBlobURL] = useState("");
   const toast = useToast();
 
   useEffect(() => {
@@ -44,6 +50,35 @@ function Main() {
         setIsBlocked(true);
       }
     );
+  }, []);
+
+  useEffect(() => {
+    const otc = localStorage.getItem("otc");
+    async function fetchUserData() {
+      await fetch(`${process.env.REACT_APP_SERVER_URL}/api/otc/${otc}`)
+        .then((r) => {
+          if (r.ok) {
+            return r.json();
+          }
+          throw r;
+        })
+        .then(({ message, data }) => {
+          localStorage.setItem("user", JSON.stringify(data));
+          return;
+        })
+        .catch(async (err) => {
+          if (err instanceof Error) {
+            throw err;
+          }
+          throw await err.json().then((rJson) => {
+            console.error(
+              `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
+            );
+            return;
+          });
+        });
+    }
+    fetchUserData();
   }, []);
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -141,10 +176,12 @@ function Main() {
   const handleMicrophoneClick = async (e) => {
     if (isMicrophoneRecording) {
       // End recording
+      setIsBlocked(true);
+
       Mp3Recorder.stop()
         .getMp3()
         .then(async ([buffer, blob]) => {
-          const file = new File(buffer, "me-at-thevoice.mp3", {
+          const file = new File(buffer, "voice-command.mp3", {
             type: blob.type,
             lastModified: Date.now(),
           });
@@ -168,10 +205,12 @@ function Main() {
                 throw r;
               })
               .then(({ message, data }) => {
-                console.log(message);
+                console.log(message, data);
                 handleWatsonResponse(data);
+                setIsBlocked(false);
               })
               .catch(async (err) => {
+                setIsBlocked(false);
                 if (err instanceof Error) {
                   throw err;
                 }
@@ -275,12 +314,16 @@ function Main() {
               pl="0.5rem"
               roundedBottomLeft="70%"
             >
-              <Icon
-                name="microphone"
-                size="4rem"
-                m="1rem"
-                color={isMicrophoneRecording ? "red.500" : "white"}
-              />
+              {isBlocked ? (
+                <Spinner size="4rem" m="1rem" color="white" speed="0.5s" />
+              ) : (
+                <Icon
+                  name="microphone"
+                  size="4rem"
+                  m="1rem"
+                  color={isMicrophoneRecording ? "red.500" : "white"}
+                />
+              )}
             </Box>
           </button>
         )}
@@ -316,7 +359,6 @@ function Main() {
                 </button>
               ))}
             </Stack>
-            {blobURL && <audio src={blobURL} controls="controls" />}
           </Box>
         )}
       </div>
