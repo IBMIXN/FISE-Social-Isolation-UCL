@@ -18,6 +18,9 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Icon,
+  Tooltip,
+  Stack,
 } from "@chakra-ui/core";
 
 import {
@@ -98,6 +101,32 @@ const DashboardPage = ({ data, session }) => {
       });
   };
 
+  const handleRefreshOtc = async (consumer_id) => {
+    await fetch(`/api/consumer/${consumer_id}`, {
+      method: "POST",
+    })
+      .then((r) => {
+        if (r.ok) {
+          return r.json();
+        }
+        throw r;
+      })
+      .then(({ message, data }) => {
+        router.replace(`/dashboard`);
+      })
+      .catch(async (err) => {
+        if (err instanceof Error) {
+          throw err;
+        }
+        throw await err.json().then((rJson) => {
+          console.error(
+            `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
+          );
+          return;
+        });
+      });
+  };
+
   useEffect(() => {
     if (!session) router.replace("/");
     if (data && !data.name) router.replace("/onboarding");
@@ -156,9 +185,22 @@ const DashboardPage = ({ data, session }) => {
                       </Text>
                     </TableCell>
                     <TableCell>
-                      <Text fontSize="sm" color="gray.500">
-                        {consumer.otc}
-                      </Text>
+                      <Stack isInline>
+                        <Text fontSize="sm" color="gray.500">
+                          {consumer.otc}
+                        </Text>
+                        <Tooltip label="Refresh OTC (Will log user out)">
+                          <Button
+                            m="0"
+                            p="0"
+                            size="1rem"
+                            label="Refresh otc"
+                            onClick={() => handleRefreshOtc(consumer._id)}
+                          >
+                            <Icon color="gray.500" name="repeat" size="1rem" />
+                          </Button>
+                        </Tooltip>
+                      </Stack>
                     </TableCell>
                     <TableCell textAlign="right">
                       <ChakraLink

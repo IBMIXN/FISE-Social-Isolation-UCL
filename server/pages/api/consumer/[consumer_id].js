@@ -53,9 +53,10 @@ const handler = async (req, res) => {
           consumer.isCloudEnabled = isCloudEnabled || consumer.isCloudEnabled;
 
           await users.updateOne({ email }, { $set: user });
-          return res
-            .status(200)
-            .json({ message: "Consumer updated successfully", data: {...consumer, consumer_id} });
+          return res.status(200).json({
+            message: "Consumer updated successfully",
+            data: { ...consumer, consumer_id },
+          });
         } catch (err) {
           console.error(`api.consumer.PUT: ${err}`);
           return res.status(500).json({ message: "Uncaught Server Error" });
@@ -77,7 +78,19 @@ const handler = async (req, res) => {
         }
         break;
       case "POST":
-      // ---------------- POST
+        // ---------------- POST
+        try {
+          consumer.otc = randomWords(3).join("-");
+          await users.updateOne({ email }, { $set: user });
+          return res.status(200).json({
+            message: "Consumer updated successfully",
+            data: { ...consumer, consumer_id },
+          });
+        } catch (err) {
+          console.error(`api.consumer.PUT: ${err}`);
+          return res.status(500).json({ message: "Uncaught Server Error" });
+        }
+        break;
       default:
         return res.status(405).json({ message: "This route does not exist" });
         break;
