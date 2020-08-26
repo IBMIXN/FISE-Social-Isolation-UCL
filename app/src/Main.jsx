@@ -17,7 +17,7 @@ import img2 from "./assets/img2.jpg";
 import img3 from "./assets/img3.jpg";
 import img4 from "./assets/img4.jpg";
 import { Redirect } from "react-router-dom";
-import { Box, Icon, Image, Stack, Text } from "@chakra-ui/core";
+import { Box, Icon, Image, Stack, Text, useToast } from "@chakra-ui/core";
 
 const Mp3Recorder = new MicRecorder({ bitRate: 128 });
 
@@ -30,6 +30,7 @@ function Main() {
   const [isMicrophoneRecording, setIsMicrophoneRecording] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blobURL, setBlobURL] = useState("");
+  const toast = useToast();
 
   useEffect(() => {
     navigator.mediaDevices.getUserMedia(
@@ -50,35 +51,9 @@ function Main() {
 
   const handleChangeScene = () => {
     setCurrentSceneIndex((currentSceneIndex + 1) % scenes.length);
-    console.log(currentSceneIndex);
   };
 
-  const handleMicrophoneClick = async (e) => {
-    if (isMicrophoneRecording) {
-      // End recording
-      Mp3Recorder.stop()
-        .getMp3()
-        .then(([buffer, blob]) => {
-          const blobURL = URL.createObjectURL(blob);
-          setBlobURL(blobURL);
-          setIsMicrophoneRecording(false);
-        })
-        .catch((e) => console.log(e));
-    } else {
-      // Begin recording
-      if (isBlocked) {
-        console.log("Permission Denied");
-      } else {
-        Mp3Recorder.start()
-          .then(() => {
-            setIsMicrophoneRecording(true);
-          })
-          .catch((e) => console.error(e));
-      }
-    }
-  };
-
-  const handleAvatarClick = async (contact_id) => {
+  const handleMakeCall = async (contact_id) => {
     await fetch(`${process.env.REACT_APP_SERVER_URL}/api/otc/${user.otc}`, {
       method: "POST",
       headers: {
@@ -107,6 +82,123 @@ function Main() {
           return;
         });
       });
+  };
+
+  const handleWatsonResponse = ({ action, contact_id, text }) => {
+    if (!text) {
+      // No text was detected
+      toast({
+        title: "We couldn't hear you.",
+        description:
+          "Please try moving somewhere quieter or speaking more loudly.",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else if (!action) {
+      // No intent recognized
+      toast({
+        title: "We couldn't understand you.",
+        description: "Sorry, we couldn't understand what you said",
+        status: "error",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else if (action === "startCall" && !contact_id) {
+      // No contact found
+      toast({
+        title: "We don't know who that is.",
+        description: "Sorry, we don't recognize that person.",
+        status: "warning",
+        duration: 9000,
+        isClosable: true,
+      });
+    } else {
+      // We have a valid request
+      switch (action) {
+        case "startExercise":
+          console.log("Exercise initiated");
+          break;
+        case "changeBackground":
+          handleChangeScene();
+          break;
+        case "startCall":
+          handleMakeCall(contact_id);
+          break;
+        default:
+          toast({
+            title: "We couldn't hear you.",
+            description:
+              "Please try moving somewhere quieter or speaking more loudly.",
+            status: "error",
+            duration: 9000,
+            isClosable: true,
+          });
+      }
+    }
+  };
+
+  const handleMicrophoneClick = async (e) => {
+    if (isMicrophoneRecording) {
+      // End recording
+      Mp3Recorder.stop()
+        .getMp3()
+        .then(async ([buffer, blob]) => {
+          const file = new File(buffer, "me-at-thevoice.mp3", {
+            type: blob.type,
+            lastModified: Date.now(),
+          });
+
+          var reader = new FileReader();
+          reader.onload = async () => {
+            const mp3_base64 = btoa(reader.result);
+            await fetch(
+              `${
+                process.env.REACT_APP_SERVER_URL
+              }/api/otc/watson/${localStorage.getItem("otc")}`,
+              {
+                method: "POST",
+                body: mp3_base64,
+              }
+            )
+              .then((r) => {
+                if (r.ok) {
+                  return r.json();
+                }
+                throw r;
+              })
+              .then(({ message, data }) => {
+                console.log(message);
+                handleWatsonResponse(data);
+              })
+              .catch(async (err) => {
+                if (err instanceof Error) {
+                  throw err;
+                }
+                throw await err.json().then((rJson) => {
+                  console.error(
+                    `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
+                  );
+                  return;
+                });
+              });
+          };
+          reader.readAsBinaryString(file);
+          setIsMicrophoneRecording(false);
+        })
+        .catch((e) => console.log(e));
+    } else {
+      // Begin recording
+      if (isBlocked) {
+        console.log("Permission Denied");
+      } else {
+        Mp3Recorder.start()
+          .then(() => {
+            setIsMicrophoneRecording(true);
+          })
+          .catch((e) => console.error(e));
+      }
+    }
   };
 
   return (
@@ -204,7 +296,7 @@ function Main() {
               {user.contacts.map((contact) => (
                 <button
                   style={{ outline: "none" }}
-                  onClick={() => handleAvatarClick(contact._id)}
+                  onClick={() => handleMakeCall(contact._id)}
                 >
                   {contact.profileImage ? (
                     <Image
