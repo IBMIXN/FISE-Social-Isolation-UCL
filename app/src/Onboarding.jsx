@@ -19,43 +19,6 @@ import { useEffect } from "react";
 
 import Footer from "./components/Footer";
 
-// THIS FOR POST REQUEST
-// const contact_id = "7c9c0aee-70af-44e1-b343-d177219e40a3";
-
-// await fetch(`${process.env.REACT_APP_SERVER_URL}/api/otc/${values.otc}`, {
-//   method: "POST",
-//   headers: {
-//     "Content-Type": "application/x-www-form-urlencoded",
-//   },
-//   body: `contact_id=${contact_id}`,
-// })
-//   .then((r) => {
-//     if (r.ok) {
-//       return r.json();
-//     }
-//     throw r;
-//   })
-//   .then(({ message, data }) => {
-//     // setTimeout(() => {
-//     // router.replace("/dashboard");
-//     console.log(message, data);
-//     actions.setSubmitting(false);
-//     // }, 500);
-//   })
-//   .catch(async (err) => {
-//     actions.setSubmitting(false);
-//     if (err instanceof Error) {
-//       throw err;
-//     }
-//     throw await err.json().then((rJson) => {
-//       console.error(
-//         `HTTP ${err.status} ${err.statusText}: ${rJson.message}`
-//       );
-//       return;
-//     });
-//   });
-// END POST REQUEST
-
 function Onboarding() {
   const [userIsValid, setUserIsValid] = useState(false);
   const [error, setError] = useState("");
