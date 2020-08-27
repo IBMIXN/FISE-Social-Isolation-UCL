@@ -30,7 +30,7 @@ const interfaceConfigOverwrite = {
   TOOLBAR_BUTTONS: [
     // 'microphone',
     // 'camera',
-    // "hangup",
+    "hangup",
   ],
   TOOLBAR_TIMEOUT: 5000,
   VIDEO_QUALITY_LABEL_DISABLED: true,

@@ -86,10 +86,9 @@ function Main() {
     fetchUserData();
   }, []);
 
-
   const rawUser = localStorage.getItem("user");
   if (!rawUser) return <Redirect to="/onboarding" />;
-  const user = JSON.parse(rawUser)
+  const user = JSON.parse(rawUser);
 
   const handleChangeScene = () => {
     setCurrentSceneIndex((currentSceneIndex + 1) % scenes.length);
@@ -339,31 +338,33 @@ function Main() {
             pos="absolute"
             bottom="20%"
             left={`calc(50vw - ${
-              user.contacts.length === 1 ? "5" : user.contacts.length * 7
+              user.contacts.length === 1 ? "5" : user.contacts.length * 6
             }rem)`}
           >
             <Stack isInline spacing="6rem">
-              {user.contacts.map((contact) => (
-                <button
-                  style={{ outline: "none" }}
-                  onClick={() => handleMakeCall(contact._id)}
-                >
-                  {contact.profileImage ? (
-                    <Image
-                      rounded="full"
-                      size="10rem"
-                      src={contact.profileImage}
-                      alt="Segun Adebayo"
-                      pointerEvents="none"
-                    />
-                  ) : (
-                    <Box w="10rem" h="10rem" rounded="100%" bg="red.300">
-                      <Text fontSize="6rem" lineHeight="10rem">
-                        {contact.name[0]}
-                      </Text>
-                    </Box>
-                  )}
-                </button>
+              {user.contacts.map((contact, index) => (
+                <Box>
+                  <button
+                    style={{ outline: "none" }}
+                    onClick={() => handleMakeCall(contact._id)}
+                  >
+                    {contact.profileImage ? (
+                      <Image
+                        rounded="full"
+                        size="10rem"
+                        src={contact.profileImage}
+                        alt="Segun Adebayo"
+                        pointerEvents="none"
+                      />
+                    ) : (
+                      <Box w="10rem" h="10rem" rounded="100%" bg={colors[index % colors.length]}>
+                        <Text fontSize="6rem" lineHeight="10rem">
+                          {contact.name[0]}
+                        </Text>
+                      </Box>
+                    )}
+                  </button>
+                </Box>
               ))}
             </Stack>
           </Box>
@@ -372,5 +373,7 @@ function Main() {
     </>
   );
 }
+
+const colors = ["red.300", "blue.300", "green.300"]
 
 export default Main;
