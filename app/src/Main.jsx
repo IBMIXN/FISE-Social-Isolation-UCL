@@ -359,7 +359,7 @@ function Main() {
                     ) : (
                       <Box w="10rem" h="10rem" rounded="100%" bg={colors[index % colors.length]}>
                         <Text fontSize="6rem" lineHeight="10rem">
-                          {contact.name[0]}
+                          {contact.name[0].toUpperCase()}
                         </Text>
                       </Box>
                     )}

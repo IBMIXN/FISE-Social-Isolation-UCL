@@ -3,6 +3,7 @@
 import Cors from "cors";
 import nodemailer from "nodemailer";
 import { connectToDatabase } from "../../../utils/mongodb";
+import { capitalize } from "../../../utils";
 
 const cors = Cors({
   methods: ["GET", "HEAD", "POST"],
@@ -46,7 +47,9 @@ const handler = async (req, res) => {
   );
 
   if (!user)
-    return res.status(403).json({ message: "You don't have access to this page" });
+    return res
+      .status(403)
+      .json({ message: "You don't have access to this page" });
 
   const consumer = user.consumers.find(
     (c) => c.otc.split("-").join("") === otc
@@ -57,7 +60,9 @@ const handler = async (req, res) => {
       case "GET":
         // ---------------- GET
         try {
-          return res.status(200).json({ message: "Data found", data: consumer });
+          return res
+            .status(200)
+            .json({ message: "Data found", data: consumer });
         } catch (err) {
           console.error(`api.otc.consumer.GET: ${err}`);
           return res.status(500).json({ message: "Uncaught Server Error" });
@@ -72,7 +77,8 @@ const handler = async (req, res) => {
 
           const contact = consumer.contacts.find((c) => c._id === contact_id);
 
-          if (!contact) return res.status(400).json({ message: "Missing Params" });
+          if (!contact)
+            return res.status(400).json({ message: "Missing Params" });
 
           let transporter = nodemailer.createTransport(
             process.env.EMAIL_SERVER
@@ -81,9 +87,19 @@ const handler = async (req, res) => {
           const message = {
             from: process.env.EMAIL_FROM,
             to: contact.email,
-            subject: `${consumer.name} would like to speak to you on Lounge`,
-            text: `Hi ${contact.name}, ${consumer.name} would like to speak to you on Lounge.`,
-            html: `<p>Hi there ${contact.name},<br /> ${consumer.name} would like to speak to you on Lounge. Click <a href="${process.env.JITSI_MEET_URL}/${contact._id}">here</a> to join.<br /><br />Thanks,<br />FISE Lounge Team</p>`,
+            subject: `${capitalize(
+              consumer.name
+            )} would like to speak to you on Lounge`,
+            text: `Hi ${capitalize(contact.name)}, ${capitalize(
+              consumer.name
+            )} would like to speak to you on Lounge.`,
+            html: `<p>Hi there ${capitalize(contact.name)},<br /> ${capitalize(
+              consumer.name
+            )} would like to speak to you on Lounge. Click <a href="${
+              process.env.JITSI_MEET_URL
+            }/${
+              contact._id
+            }">here</a> to join.<br /><br />Thanks,<br />FISE Lounge Team</p>`,
           };
 
           transporter.sendMail(message);
@@ -103,7 +119,9 @@ const handler = async (req, res) => {
         break;
     }
   } else {
-    return res.status(403).json({ message: "You don't have access to this page" });
+    return res
+      .status(403)
+      .json({ message: "You don't have access to this page" });
   }
 };
 
