@@ -8,13 +8,12 @@ const handler = async (req, res) => {
 
   if (session) {
     const email = session.username;
-    const { body, method } = req;
 
     const { client } = await connectToDatabase();
     const db = await client.db(process.env.MONGODB_DB);
     const users = db.collection("users");
 
-    switch (method) {
+    switch (req.method) {
       case "GET":
         // ---------------- GET
         break;
@@ -40,7 +39,9 @@ const handler = async (req, res) => {
         break;
     }
   } else {
-    return res.status(403).json({ message: "You don't have access to this page" });
+    return res
+      .status(403)
+      .json({ message: "You don't have access to this page" });
   }
 };
 

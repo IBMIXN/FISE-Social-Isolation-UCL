@@ -3,6 +3,7 @@
 import { getSession } from "../../../lib/iron";
 import { connectToDatabase } from "../../../utils/mongodb";
 import randomWords from "random-words";
+import { sanitizeName } from "../../../utils";
 
 const handler = async (req, res) => {
   const session = await getSession(req);
@@ -50,7 +51,7 @@ const handler = async (req, res) => {
       try {
         const { name, isCloudEnabled } = body;
 
-        consumer.name = name || consumer.name;
+        consumer.name = sanitizeName(name) || consumer.name;
         consumer.isCloudEnabled = isCloudEnabled || consumer.isCloudEnabled;
 
         await users.updateOne({ email }, { $set: user });
@@ -80,6 +81,7 @@ const handler = async (req, res) => {
       break;
     case "POST":
       // ---------------- POST
+      // Refresh OTC
       try {
         consumer.otc = randomWords(3).join("-");
         await users.updateOne({ email }, { $set: user });

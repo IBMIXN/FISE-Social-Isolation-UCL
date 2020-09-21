@@ -4,12 +4,13 @@ import { getSession } from "../../../lib/iron";
 import { connectToDatabase } from "../../../utils/mongodb";
 import randomWords from "random-words";
 import uuid from "node-uuid";
+import { sanitizeName } from "../../../utils";
 
 const handler = async (req, res) => {
   const session = await getSession(req);
 
   if (session) {
-    const email = session.username
+    const email = session.username;
     const { body, method } = req;
 
     const { client } = await connectToDatabase();
@@ -17,7 +18,7 @@ const handler = async (req, res) => {
     const users = db.collection("users");
 
     const user = await users.findOne({ email: email });
-    
+
     switch (method) {
       case "POST":
         // ---------------- POST
@@ -26,7 +27,7 @@ const handler = async (req, res) => {
           if (!name || !isCloudEnabled) throw new Error("Missing params");
           var consumer = {
             _id: uuid.v4(),
-            name: name,
+            name: sanitizeName(name),
             isCloudEnabled: isCloudEnabled,
             otc: randomWords(3).join("-"),
             ar_scenes: [],

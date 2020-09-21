@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { Formik, Field } from "formik";
 
 import { useUser } from "../../../lib/hooks";
+import { validateName } from "../../../utils";
 
 import {
   Text,
@@ -22,18 +23,6 @@ import Breadcrumbs from "../../../components/Breadcrumbs";
 import Loading from "../../../components/Loading";
 
 const NameForm = ({ router }) => {
-  function validateName(value) {
-    let error = "";
-    if (!value) {
-      error = "Required";
-    } else if (value.length > 15) {
-      error = "Must be 15 characters or less";
-    } else if (!/^[a-z]+$/i.test(value)) {
-      error = "Invalid characters, we only want their first name!";
-    }
-    return error;
-  }
-
   const handleFormSubmit = async (values, actions) => {
     const formBody = Object.entries(values)
       .map(

@@ -2,10 +2,7 @@ import { useEffect } from "react";
 import Router from "next/router";
 import useSWR from "swr";
 
-const fetcher = (url) =>
-  fetch(url)
-    .then((r) => r.json())
-    .then((res) => res?.data || null);
+import { fetcher } from "../utils";
 
 export function useUser({ redirectTo, redirectIfFound } = {}) {
   const { data, error } = useSWR("/api/user", fetcher);

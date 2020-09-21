@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { mutate } from "swr";
 
 import { useUser } from "../../lib/hooks";
+import { capitalize } from "../../utils";
 
 import {
   Box,
@@ -53,16 +54,23 @@ const DeleteUserModal = ({ onClick }) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Delete Your Account?</ModalHeader>
+          <ModalHeader>Delete Your FISE Lounge Account?</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>Are you sure you want to perform this action?</ModalBody>
+          <ModalBody>
+            Are you sure you want to delete your entire FISE Lounge
+            adminisitration account?
+            <Text color="red.300">
+              All of your users, their contacts and all their details will be
+              deleted forever!
+            </Text>
+          </ModalBody>
 
           <ModalFooter>
             <Button variantColor="blue" mr={3} onClick={onClose}>
               Cancel
             </Button>
             <Button variantColor="red" onClick={onClick}>
-              Confirm
+              Yes, I want to delete my account
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -130,12 +138,15 @@ const DashboardPage = () => {
       <Nav />
       <Main>
         <Breadcrumbs links={[["Dashboard", "/dashboard"]]} />
-        <Heading>Welcome to the Dashboard, {user.name}</Heading>
-        <Box mt="3rem">
-          <Button leftIcon="exit" variantColor="red" as="a" href="/api/logout">
-            Sign Out
-          </Button>
-        </Box>
+        <Heading>Welcome to the Dashboard, {capitalize(user.name)}</Heading>
+        <Text>
+          To set up your loved one with FISE Lounge, first Add a new user to set
+          up their details and contacts, then go to{` `}
+          <ChakraLink href="https://app.fise.ml" textDecoration="underline">
+            app.fise.ml
+          </ChakraLink>
+          {` `} on their device and enter in their One-Time-Code given below.
+        </Text>
 
         <Box mt="3rem">
           <Table>
@@ -161,7 +172,7 @@ const DashboardPage = () => {
                         as="a"
                         href={`/dashboard/consumer/${consumer._id}`}
                       >
-                        {consumer.name}
+                        {capitalize(consumer.name)}
                       </Text>
                     </TableCell>
                     <TableCell>
@@ -217,7 +228,15 @@ const DashboardPage = () => {
             </TableBody>
           </Table>
         </Box>
-        <Box mt="3rem">
+        <Heading mt="3rem" size="lg" color="red.200">
+          Danger Zone
+        </Heading>
+        <Box>
+          <Button leftIcon="exit" variantColor="red" as="a" href="/api/logout">
+            Sign Out ({user.email})
+          </Button>
+        </Box>
+        <Box>
           <DeleteUserModal onClick={handleDeleteUser} />
         </Box>
       </Main>

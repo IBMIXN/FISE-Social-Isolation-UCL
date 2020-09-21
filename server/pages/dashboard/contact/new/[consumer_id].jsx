@@ -4,7 +4,13 @@ import useSWR from "swr";
 import { Formik, Field } from "formik";
 
 import { useUser } from "../../../../lib/hooks";
-import { fetcher } from "../../../../utils/fetcher";
+import {
+  fetcher,
+  capitalize,
+  validateName,
+  validateEmail,
+  validateRelation,
+} from "../../../../utils";
 
 import {
   Text,
@@ -27,36 +33,7 @@ import Loading from "../../../../components/Loading";
 const NameForm = ({ router }) => {
   const [formError, setFormError] = useState("");
 
-  function validateName(value) {
-    let error = "";
-    if (!value) {
-      error = "Required";
-    } else if (value.length > 15) {
-      error = "Must be 15 characters or less";
-    } else if (!/^[a-z\s]+$/i.test(value)) {
-      error = "Invalid characters";
-    }
-    return error;
-  }
-
-  function validateEmail(value) {
-    let error = "";
-    if (!value) {
-      error = "Required";
-    } else if (value.length > 50) {
-      error = "Must be 50 characters or less";
-    } else if (
-      !/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-        value
-      )
-    ) {
-      error = "Please enter a valid email address";
-    }
-    return error;
-  }
-
   const handleFormSubmit = async (values, actions) => {
-    values.name = values.name.split(/\s/)[0];
     const valuesToSend = { ...values, consumer_id: router.query.consumer_id };
     const formBody = Object.entries(valuesToSend)
       .map(
@@ -141,7 +118,12 @@ const NameForm = ({ router }) => {
           <FormControl>
             <FormLabel htmlFor="relation">What relation is this?</FormLabel>
 
-            <Field as={Select} name="relation" placeholder="Select Relation">
+            <Field
+              as={Select}
+              name="relation"
+              placeholder="Select Relation"
+              validate={validateRelation}
+            >
               <option value="son">Their son</option>
               <option value="daughter">Their daughter</option>
               <option value="grandson">Their grandson</option>
@@ -191,15 +173,18 @@ const NewContactPage = () => {
         <Breadcrumbs
           links={[
             ["Dashboard", "/dashboard"],
-            [`${consumer.name}'s User Profile`, `/dashboard/consumer/${consumer_id}`],
+            [
+              `${capitalize(consumer.name)}'s User Profile`,
+              `/dashboard/consumer/${consumer_id}`,
+            ],
             ["Add a Contact", "#"],
           ]}
         />
-        <Heading>Create a New Contact for {consumer.name}</Heading>
+        <Heading>Create a New Contact for {capitalize(consumer.name)}</Heading>
         <Text>
-          {consumer.name} will be able to call this person in the FISE Lounge
-          app <br /> (If you haven't already, you will need to add yourself as a
-          contact too).
+          {capitalize(consumer.name)} will be able to call this person in the
+          FISE Lounge app <br /> (If you haven't already, you will need to add
+          yourself as a contact too).
         </Text>
         <NameForm router={router} />
       </Main>

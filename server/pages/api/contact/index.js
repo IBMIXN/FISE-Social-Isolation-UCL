@@ -4,6 +4,7 @@ import { getSession } from "../../../lib/iron";
 import { connectToDatabase } from "../../../utils/mongodb";
 import uuid from "node-uuid";
 import relations from "../../../utils/relations";
+import { sanitizeName } from "../../../utils";
 
 const handler = async (req, res) => {
   const session = await getSession(req);
@@ -25,10 +26,12 @@ const handler = async (req, res) => {
           const {
             consumer_id,
             name,
-            email: contact_email,
+            email: contact_email_raw,
             profileImage,
             relation: relationStr,
           } = body;
+
+          const contact_email = contact_email_raw.toLowerCase();
 
           const relation = relations.indexOf(relationStr.toLowerCase());
 
@@ -37,7 +40,7 @@ const handler = async (req, res) => {
 
           var newContact = {
             _id: uuid.v4(),
-            name: name,
+            name: sanitizeName(name),
             email: contact_email,
             relation: relation,
             profileImage: "",

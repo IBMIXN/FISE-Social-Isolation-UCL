@@ -1,6 +1,7 @@
 // Contact Routes
 
 import { getSession } from "../../../lib/iron";
+import { sanitizeName } from "../../../utils";
 import { connectToDatabase } from "../../../utils/mongodb";
 import relations from "../../../utils/relations";
 
@@ -78,8 +79,8 @@ const handler = async (req, res) => {
 
           consumer.contacts[contactIndex] = {
             ...consumer.contacts[contactIndex],
-            ...(name && { name }),
-            ...(contactEmail && { email: contactEmail }),
+            ...(name && { name: sanitizeName(name) }),
+            ...(contactEmail && { email: contactEmail.toLowerCase() }),
             ...(profileImage && { profileImage }),
             ...(relation && { relation }),
           };

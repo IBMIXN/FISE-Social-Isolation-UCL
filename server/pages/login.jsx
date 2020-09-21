@@ -3,6 +3,7 @@ import { mutate } from "swr";
 import { Formik, Field } from "formik";
 
 import { useUser } from "../lib/hooks";
+import { validateEmail, validatePassword } from "../utils";
 
 import {
   Text,
@@ -23,32 +24,6 @@ import { Footer } from "../components/Footer";
 
 const NameForm = ({ router }) => {
   const toast = useToast();
-
-  function validateEmail(value) {
-    let error = "";
-    if (!value) {
-      error = "Required";
-    } else if (value.length > 50) {
-      error = "Must be 50 characters or less";
-    } else if (
-      !/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/.test(
-        value
-      )
-    ) {
-      error = "Please enter a valid email address";
-    }
-    return error;
-  }
-
-  function validatePassword(value) {
-    let error = "";
-    if (!value) {
-      error = "Required";
-    } else if (value.length < 8) {
-      error = "Must be at least 8 characters";
-    }
-    return error;
-  }
 
   const handleFormSubmit = async (values, actions) => {
     try {
