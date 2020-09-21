@@ -44,7 +44,6 @@ function Onboarding() {
         throw r;
       })
       .then(({ message, data }) => {
-        console.log(message, data);
         localStorage.setItem("otc", values.otc);
         localStorage.setItem("user", JSON.stringify(data));
         actions.setSubmitting(false);

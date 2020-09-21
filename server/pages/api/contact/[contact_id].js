@@ -1,6 +1,6 @@
 // Contact Routes
 
-import { getSession } from "next-auth/client";
+import { getSession } from "../../../lib/iron";
 import { connectToDatabase } from "../../../utils/mongodb";
 import relations from "../../../utils/relations";
 
@@ -12,12 +12,10 @@ const getContact = (user, contact_id) => {
 };
 
 const handler = async (req, res) => {
-  const session = await getSession({ req });
+  const session = await getSession(req);
 
   if (session) {
-    const {
-      user: { email },
-    } = session;
+    const email = session.username;
     const {
       query: { contact_id },
       body,
@@ -53,7 +51,11 @@ const handler = async (req, res) => {
           const contact = consumer.contacts[contactIndex];
           return res.status(200).json({
             message: "Contact Data found",
-            data: { ...contact, consumer_id: consumer._id },
+            data: {
+              ...contact,
+              consumer_id: consumer._id,
+              consumer_name: consumer.name,
+            },
           });
         } catch (err) {
           console.error(`api.contact.GET: ${err}`);

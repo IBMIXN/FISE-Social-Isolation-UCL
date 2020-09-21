@@ -1,4 +1,3 @@
-import { signin } from "next-auth/client";
 import { Link as ChakraLink, Button } from "@chakra-ui/core";
 
 import { Container } from "./Container";
@@ -18,11 +17,7 @@ export const CTA = () => (
       mx={2}
     >
       <a
-        href={`/api/auth/signin`}
-        onClick={(e) => {
-          e.preventDefault();
-          signin();
-        }}
+        href={`/login`}
       >
         <Button width="100%" variant="solid" variantColor="blue">
           Get Started Now

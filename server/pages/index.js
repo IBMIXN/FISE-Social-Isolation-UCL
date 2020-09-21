@@ -1,4 +1,5 @@
-import { useSession } from "next-auth/client";
+import { useUser } from "../lib/hooks";
+
 import { Heading, List, ListIcon, ListItem } from "@chakra-ui/core";
 
 import { Container } from "../components/Container";
@@ -9,7 +10,7 @@ import { Footer } from "../components/Footer";
 import { CTA } from "../components/CTA";
 
 const IndexPage = () => {
-  const [session, loading] = useSession();
+  const user = useUser();
   return (
     <Container>
       <Nav />
@@ -36,7 +37,7 @@ const IndexPage = () => {
         </List>
       </Main>
       <Footer />
-      {!loading && !session && <CTA />}
+      {!user && <CTA />}
     </Container>
   );
 };

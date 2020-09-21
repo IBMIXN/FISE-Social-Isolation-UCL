@@ -1,10 +1,9 @@
-import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
+import useSWR from "swr";
 import { Formik, Field } from "formik";
 
-import useSWR from "swr";
+import { useUser } from "../../../lib/hooks";
 import fetcher from "../../../utils/fetcher";
-
 import relations from "../../../utils/relations";
 
 import {
@@ -15,17 +14,15 @@ import {
   Input,
   Select,
   FormErrorMessage,
-  Text,
   Heading,
 } from "@chakra-ui/core";
 
 import { Nav } from "../../../components/Nav";
 import { Container } from "../../../components/Container";
 import { Main } from "../../../components/Main";
-import Breadcrumbs from "../../../components/Breadcrumbs";
 import { Footer } from "../../../components/Footer";
+import Breadcrumbs from "../../../components/Breadcrumbs";
 import Loading from "../../../components/Loading";
-import { useEffect } from "react";
 
 const MakeChangesForm = ({
   router,
@@ -190,14 +187,19 @@ const MakeChangesForm = ({
   );
 };
 
-const ConsumerPage = ({ data, session }) => {
+const ContactPage = () => {
   const router = useRouter();
-  const { contact_id } = router.query;
+  const user = useUser({ redirectTo: "/login" });
 
-  useEffect(() => {
-    if (!session) router.replace("/");
-    if (data && !data.name) router.replace("/onboarding");
-  }, []);
+  const { contact_id } = router.query;
+  const { data: contact, error } = useSWR(
+    contact_id && `/api/contact/${contact_id}`,
+    fetcher
+  );
+
+  if (error) {
+    router.replace("/dashboard");
+  }
 
   const handleDeleteContact = async () => {
     await fetch(contact_id && `/api/contact/${contact_id}`, {
@@ -205,7 +207,8 @@ const ConsumerPage = ({ data, session }) => {
     })
       .then((r) => {
         if (r.ok) {
-          if (data) router.replace(`/dashboard/consumer/${data.consumer_id}`);
+          if (contact)
+            router.replace(`/dashboard/consumer/${contact.consumer_id}`);
           else router.replace(`/dashboard`);
           return;
         }
@@ -224,23 +227,26 @@ const ConsumerPage = ({ data, session }) => {
       });
   };
 
-  return session && data ? (
+  return contact ? (
     <Container>
       <Nav />
       <Main>
         <Breadcrumbs
           links={[
             ["Dashboard", "/dashboard"],
-            ["User", `/dashboard/consumer/${data.consumer_id}`],
-            ["Contacts", "#"],
+            [
+              `${contact.consumer_name}'s User Profile`,
+              `/dashboard/consumer/${contact.consumer_id}`,
+            ],
+            [`${contact.name}'s Contact Details`, "#"],
           ]}
         />
-        <Heading>Editing {data.name}'s Contact Details</Heading>
+        <Heading>Editing {contact.name}'s Contact Details</Heading>
         <MakeChangesForm
           router={router}
-          currentName={data.name}
-          currentEmail={data.email}
-          currentRelation={relations[data.relation]}
+          currentName={contact.name}
+          currentEmail={contact.email}
+          currentRelation={relations[contact.relation]}
           contact_id={contact_id}
         />
         <Box mt="3rem">
@@ -260,27 +266,4 @@ const ConsumerPage = ({ data, session }) => {
   );
 };
 
-export default ConsumerPage;
-
-export async function getServerSideProps(context) {
-  const { contact_id } = context.params;
-  const session = await getSession(context);
-  let data = null;
-
-  if (session) {
-    const hostname = process.env.NEXTAUTH_URL;
-    const options = { headers: { cookie: context.req.headers.cookie } };
-    const res = await fetch(`${hostname}/api/contact/${contact_id}`, options);
-    const json = await res.json();
-    if (json.data) {
-      data = json.data;
-    }
-  }
-
-  return {
-    props: {
-      session,
-      data,
-    },
-  };
-}
+export default ContactPage;

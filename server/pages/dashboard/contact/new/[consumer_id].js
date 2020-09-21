@@ -1,6 +1,10 @@
-import { getSession } from "next-auth/client";
+import { useState } from "react";
 import { useRouter } from "next/router";
+import useSWR from "swr";
 import { Formik, Field } from "formik";
+
+import { useUser } from "../../../../lib/hooks";
+import { fetcher } from "../../../../utils/fetcher";
 
 import {
   Text,
@@ -13,13 +17,12 @@ import {
   Select,
 } from "@chakra-ui/core";
 
-import Loading from "../../../../components/Loading";
 import { Nav } from "../../../../components/Nav";
 import { Container } from "../../../../components/Container";
 import { Main } from "../../../../components/Main";
 import { Footer } from "../../../../components/Footer";
 import Breadcrumbs from "../../../../components/Breadcrumbs";
-import { useEffect, useState } from "react";
+import Loading from "../../../../components/Loading";
 
 const NameForm = ({ router }) => {
   const [formError, setFormError] = useState("");
@@ -30,8 +33,8 @@ const NameForm = ({ router }) => {
       error = "Required";
     } else if (value.length > 15) {
       error = "Must be 15 characters or less";
-    } else if (!/^[a-z]+$/i.test(value)) {
-      error = "Invalid characters, we only want their first name!";
+    } else if (!/^[a-z\s]+$/i.test(value)) {
+      error = "Invalid characters";
     }
     return error;
   }
@@ -53,6 +56,7 @@ const NameForm = ({ router }) => {
   }
 
   const handleFormSubmit = async (values, actions) => {
+    values.name = values.name.split(/\s/)[0];
     const valuesToSend = { ...values, consumer_id: router.query.consumer_id };
     const formBody = Object.entries(valuesToSend)
       .map(
@@ -76,7 +80,7 @@ const NameForm = ({ router }) => {
       })
       .then(({ message, data: contact }) => {
         setTimeout(() => {
-          router.replace(`/dashboard/contact/${contact._id}`);
+          router.replace(`/dashboard/consumer/${router.query.consumer_id}`);
           actions.setSubmitting(false);
         }, 1500);
       })
@@ -169,31 +173,32 @@ const NameForm = ({ router }) => {
   );
 };
 
-const NewContactPage = ({ data, session }) => {
+const NewContactPage = () => {
   const router = useRouter();
-
-  useEffect(() => {
-    if (!session) router.replace("/");
-    if (data && !data.name) router.replace("/onboarding");
-  }, []);
+  const user = useUser({ redirectTo: "/login" });
 
   const { consumer_id } = router.query;
 
-  return session && data ? (
+  const { data: consumer } = useSWR(
+    consumer_id && `/api/consumer/${consumer_id}`,
+    fetcher
+  );
+
+  return user && consumer ? (
     <Container>
       <Nav />
       <Main>
         <Breadcrumbs
           links={[
             ["Dashboard", "/dashboard"],
-            ["User", `/dashboard/consumer/${consumer_id}`],
-            ["New Contact", "#"],
+            [`${consumer.name}'s User Profile`, `/dashboard/consumer/${consumer_id}`],
+            ["Add a Contact", "#"],
           ]}
         />
-        <Heading>Create a New Contact for {data.name}</Heading>
+        <Heading>Create a New Contact for {consumer.name}</Heading>
         <Text>
-          {data.name} will be able to call this person in the FISE Lounge app{" "}
-          <br /> (If you haven't already, you will need to add yourself as a
+          {consumer.name} will be able to call this person in the FISE Lounge
+          app <br /> (If you haven't already, you will need to add yourself as a
           contact too).
         </Text>
         <NameForm router={router} />
@@ -206,26 +211,3 @@ const NewContactPage = ({ data, session }) => {
 };
 
 export default NewContactPage;
-
-export async function getServerSideProps(context) {
-  const { consumer_id } = context.params;
-  const session = await getSession(context);
-  let data = null;
-
-  if (session) {
-    const hostname = process.env.NEXTAUTH_URL;
-    const options = { headers: { cookie: context.req.headers.cookie } };
-    const res = await fetch(`${hostname}/api/consumer/${consumer_id}`, options);
-    const json = await res.json();
-    if (json.data) {
-      data = json.data;
-    }
-  }
-
-  return {
-    props: {
-      session,
-      data,
-    },
-  };
-}

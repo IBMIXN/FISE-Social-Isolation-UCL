@@ -1,8 +1,10 @@
-import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
+import useSWR from "swr";
 import { Formik, Field } from "formik";
 
-import fetcher from "../../../utils/fetcher";
+import { useUser } from "../../../lib/hooks";
+import { fetcher } from "../../../utils/fetcher";
+import relations from "../../../utils/relations";
 
 import {
   Box,
@@ -38,10 +40,8 @@ import { Container } from "../../../components/Container";
 import { Main } from "../../../components/Main";
 import { Footer } from "../../../components/Footer";
 import Loading from "../../../components/Loading";
-import Checkbox from "../../../components/Checkbox"
-import relations from "../../../utils/relations";
+import Checkbox from "../../../components/Checkbox";
 import Breadcrumbs from "../../../components/Breadcrumbs";
-import { useEffect } from "react";
 
 const capitalize = ([first, ...rest]) =>
   first.toUpperCase() + rest.join("").toLowerCase();
@@ -162,7 +162,7 @@ const MakeChangesForm = ({
               </FormControl>
             )}
           </Field>
-          
+
           <Field
             name="isCloudEnabled"
             type="checkbox"
@@ -186,9 +186,15 @@ const MakeChangesForm = ({
   );
 };
 
-const ConsumerPage = ({ data, session }) => {
+const ConsumerPage = () => {
   const router = useRouter();
+  const user = useUser({ redirectTo: "/login" });
   const { consumer_id } = router.query;
+
+  const { data: consumer } = useSWR(
+    consumer_id && `/api/consumer/${consumer_id}`,
+    fetcher
+  );
 
   const handleDeleteConsumer = async () => {
     await fetch(consumer_id && `/api/consumer/${consumer_id}`, {
@@ -214,29 +220,24 @@ const ConsumerPage = ({ data, session }) => {
       });
   };
 
-  useEffect(() => {
-    if (!session) router.replace("/");
-    if (data && !data.name) router.replace("/onboarding");
-  }, []);
-
-  return session && data ? (
+  return user && consumer ? (
     <Container>
       <Nav />
       <Main>
         <Breadcrumbs
           links={[
             ["Dashboard", "/dashboard"],
-            [`${data.name}'s User Profile`, "#"],
+            [`${consumer.name}'s User Profile`, "#"],
           ]}
         />
-        <Heading>Editing {data.name}'s Profile</Heading>
+        <Heading>Editing {consumer.name}'s Profile</Heading>
         <MakeChangesForm
           router={router}
           consumer_id={consumer_id}
-          currentName={data.name}
-          isCloudEnabled={data.isCloudEnabled}
+          currentName={consumer.name}
+          isCloudEnabled={consumer.isCloudEnabled}
         />
-        {data && (
+        {consumer && (
           <Box mt="3rem">
             <Table>
               <TableHead>
@@ -248,8 +249,8 @@ const ConsumerPage = ({ data, session }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {data.contacts &&
-                  data.contacts.map((contact, index) => (
+                {consumer.contacts &&
+                  consumer.contacts.map((contact, index) => (
                     <TableRow
                       bg={index % 2 === 0 ? "white" : "gray.50"}
                       key={index}
@@ -317,26 +318,3 @@ const ConsumerPage = ({ data, session }) => {
 };
 
 export default ConsumerPage;
-
-export async function getServerSideProps(context) {
-  const { consumer_id } = context.params;
-  const session = await getSession(context);
-  let data = null;
-
-  if (session) {
-    const hostname = process.env.NEXTAUTH_URL;
-    const options = { headers: { cookie: context.req.headers.cookie } };
-    const res = await fetch(`${hostname}/api/consumer/${consumer_id}`, options);
-    const json = await res.json();
-    if (json.data) {
-      data = json.data;
-    }
-  }
-
-  return {
-    props: {
-      session,
-      data,
-    },
-  };
-}

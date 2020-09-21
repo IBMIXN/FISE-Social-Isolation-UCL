@@ -1,15 +1,24 @@
 import Head from "next/head";
-import { Provider } from "next-auth/client";
-import { ThemeProvider, CSSReset, DarkMode } from "@chakra-ui/core";
+import { SWRConfig } from "swr";
+import { ThemeProvider, CSSReset, DarkMode, useToast } from "@chakra-ui/core";
 
 import theme from "../theme";
 import "../utils/global.css";
 
 const App = ({ Component, pageProps }) => {
-  const { session } = pageProps;
+  const toast = useToast();
   return (
-    <Provider options={{ site: process.env.NEXTAUTH_URL }} session={session}>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <SWRConfig
+        value={{
+          onError: (error, key) => {
+            if (error.status !== 403 && error.status !== 404) {
+              // We can send the error to Sentry,
+              // or show a notification UI.
+            }
+          },
+        }}
+      >
         <DarkMode>
           <Head>
             <title>FISE Dashboard</title>
@@ -47,8 +56,8 @@ const App = ({ Component, pageProps }) => {
           <CSSReset />
           <Component {...pageProps} />
         </DarkMode>
-      </ThemeProvider>
-    </Provider>
+      </SWRConfig>
+    </ThemeProvider>
   );
 };
 

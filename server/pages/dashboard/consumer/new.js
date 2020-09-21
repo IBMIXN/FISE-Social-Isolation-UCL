@@ -1,6 +1,8 @@
-import { getSession } from "next-auth/client";
 import { useRouter } from "next/router";
 import { Formik, Field } from "formik";
+
+import { useUser } from "../../../lib/hooks";
+
 import {
   Text,
   Heading,
@@ -15,10 +17,9 @@ import {
 import { Nav } from "../../../components/Nav";
 import { Container } from "../../../components/Container";
 import { Main } from "../../../components/Main";
-import Breadcrumbs from "../../../components/Breadcrumbs";
 import { Footer } from "../../../components/Footer";
+import Breadcrumbs from "../../../components/Breadcrumbs";
 import Loading from "../../../components/Loading";
-import { useEffect } from "react";
 
 const NameForm = ({ router }) => {
   function validateName(value) {
@@ -124,22 +125,18 @@ const NameForm = ({ router }) => {
   );
 };
 
-const NewConsumerPage = ({ session }) => {
+const NewConsumerPage = () => {
   const router = useRouter();
+  const user = useUser({ redirectTo: "/login" });
 
-  useEffect(() => {
-    if (!session) router.replace("/");
-    if (!session.user.name) router.replace("/dashboard");
-  }, []);
-
-  return session ? (
+  return user ? (
     <Container>
       <Nav />
       <Main>
         <Breadcrumbs
           links={[
             ["Dashboard", "/dashboard"],
-            ["New User", "#"],
+            ["Create User", "#"],
           ]}
         />
         <Heading>Create a New User</Heading>
@@ -157,12 +154,3 @@ const NewConsumerPage = ({ session }) => {
 };
 
 export default NewConsumerPage;
-
-export async function getServerSideProps(context) {
-  const session = await getSession(context);
-  return {
-    props: {
-      session,
-    },
-  };
-}

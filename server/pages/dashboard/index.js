@@ -1,8 +1,7 @@
-import { signOut, getSession, useSession } from "next-auth/client";
 import { useRouter } from "next/router";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 
-import fetcher from "../utils/fetcher";
+import { useUser } from "../../lib/hooks";
 
 import {
   Box,
@@ -30,15 +29,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../components/Table";
+} from "../../components/Table";
 
-import { Nav } from "../components/Nav";
-import { Container } from "../components/Container";
-import { Main } from "../components/Main";
-import { Footer } from "../components/Footer";
-import Loading from "../components/Loading";
-import { useEffect } from "react";
-import Breadcrumbs from "../components/Breadcrumbs";
+import { Nav } from "../../components/Nav";
+import { Container } from "../../components/Container";
+import { Main } from "../../components/Main";
+import { Footer } from "../../components/Footer";
+import Loading from "../../components/Loading";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 const DeleteUserModal = ({ onClick }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -73,17 +71,17 @@ const DeleteUserModal = ({ onClick }) => {
   );
 };
 
-const DashboardPage = ({ data, session }) => {
+const DashboardPage = () => {
+  const user = useUser({ redirectTo: "/login" });
   const router = useRouter();
 
   const handleDeleteUser = async () => {
-    await fetch(`/api/user`, {
+    await fetch(`/api/user/delete`, {
       method: "DELETE",
     })
       .then((r) => {
         if (r.ok) {
-          signOut({ callbackUrl: process.env.NEXTAUTH_URL });
-          router.replace("/");
+          router.replace("/api/logout");
           return;
         }
         throw r;
@@ -112,7 +110,7 @@ const DashboardPage = ({ data, session }) => {
         throw r;
       })
       .then(({ message, data }) => {
-        router.replace(`/dashboard`);
+        mutate("/api/user");
       })
       .catch(async (err) => {
         if (err instanceof Error) {
@@ -127,27 +125,14 @@ const DashboardPage = ({ data, session }) => {
       });
   };
 
-  useEffect(() => {
-    if (!session) router.replace("/");
-    if (data && !data.name) router.replace("/onboarding");
-  }, []);
-
-  return session && data ? (
+  return user ? (
     <Container>
       <Nav />
       <Main>
         <Breadcrumbs links={[["Dashboard", "/dashboard"]]} />
-        <Heading>Welcome to the Dashboard, {session.user.name}</Heading>
+        <Heading>Welcome to the Dashboard, {user.name}</Heading>
         <Box mt="3rem">
-          <Button
-            leftIcon="exit"
-            variantColor="red"
-            onClick={() => {
-              router.replace("/api/auth/signout");
-              signOut();
-              return;
-            }}
-          >
+          <Button leftIcon="exit" variantColor="red" as="a" href="/api/logout">
             Sign Out
           </Button>
         </Box>
@@ -163,8 +148,8 @@ const DashboardPage = ({ data, session }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.consumers &&
-                data.consumers.map((consumer, index) => (
+              {user.consumers &&
+                user.consumers.map((consumer, index) => (
                   <TableRow
                     bg={index % 2 === 0 ? "white" : "gray.50"}
                     key={index}
@@ -244,25 +229,3 @@ const DashboardPage = ({ data, session }) => {
 };
 
 export default DashboardPage;
-
-export async function getServerSideProps(context) {
-  const session = await getSession(context);
-  let data = null;
-
-  if (session) {
-    const hostname = process.env.NEXTAUTH_URL;
-    const options = { headers: { cookie: context.req.headers.cookie } };
-    const res = await fetch(`${hostname}/api/user`, options);
-    const json = await res.json();
-    if (json.data) {
-      data = json.data;
-    }
-  }
-
-  return {
-    props: {
-      session,
-      data,
-    },
-  };
-}

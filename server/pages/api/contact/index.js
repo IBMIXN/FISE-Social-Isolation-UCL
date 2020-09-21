@@ -1,18 +1,15 @@
 // New Contact Route
 
-import { getSession } from "next-auth/client";
+import { getSession } from "../../../lib/iron";
 import { connectToDatabase } from "../../../utils/mongodb";
-import randomWords from "random-words";
 import uuid from "node-uuid";
 import relations from "../../../utils/relations";
 
 const handler = async (req, res) => {
-  const session = await getSession({ req });
+  const session = await getSession(req);
 
   if (session) {
-    const {
-      user: { email },
-    } = session;
+    const email = session.username;
     const { body, method } = req;
 
     const { client } = await connectToDatabase();
