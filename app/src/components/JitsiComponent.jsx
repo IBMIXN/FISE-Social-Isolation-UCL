@@ -7,14 +7,16 @@ const configOverwrite = {
   disableDeepLinking: true,
   enableWelcomePage: false,
   enableClosePage: false,
+  prejoinPageEnabled: false,
 };
 
 const interfaceConfigOverwrite = {
+  LANG_DETECTION: true,
   APP_NAME: "FISE Lounge",
   SHOW_POWERED_BY: false,
   SHOW_PROMOTIONAL_CLOSE_PAGE: false,
   MOBILE_APP_PROMO: false,
-  HIDE_INVITE_MORE_HEADER: true,
+  HIDE_INVITE_MORE_HEADER: false,
   DISABLE_RINGING: true,
   DISABLE_TRANSCRIPTION_SUBTITLES: true,
   DISABLE_VIDEO_BACKGROUND: true,
@@ -22,20 +24,20 @@ const interfaceConfigOverwrite = {
   ENABLE_FEEDBACK_ANIMATION: false,
   SHOW_BRAND_WATERMARK: false,
   SHOW_JITSI_WATERMARK: false,
-  SHOW_WATERMARK_FOR_GUESTS: true,
+  SHOW_WATERMARK_FOR_GUESTS: false,
   CONNECTION_INDICATOR_AUTO_HIDE_TIMEOUT: 1,
   CONNECTION_INDICATOR_DISABLED: true,
   INITIAL_TOOLBAR_TIMEOUT: 200000,
   TOOLBAR_ALWAYS_VISIBLE: true,
-  TOOLBAR_BUTTONS: [
-    // 'microphone',
-    // 'camera',
-    "hangup",
-  ],
+  SETTINGS_SECTIONS: [ 'devices', 'language'], 
+  TOOLBAR_BUTTONS: [ 'microphone', 'camera', 'hangup', 'invite', 'settings', 'livestreaming'], // languages can't be added to toolbar
   TOOLBAR_TIMEOUT: 5000,
   VIDEO_QUALITY_LABEL_DISABLED: true,
   HIDE_KICK_BUTTON_FOR_GUESTS: true,
+  SHOW_CHROME_EXTENSION_BANNER: false,
+  DEFAULT_BACKGROUND: '#E5E6E4'
 };
+
 
 const JitsiComponent = (props) => {
   const {

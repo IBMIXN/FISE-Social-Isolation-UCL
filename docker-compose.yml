@@ -1,0 +1,40 @@
+version: "3"
+services:
+  fise-app:
+    restart: always
+    env_file:
+      - ./app/.env.local
+    build: ./app
+    stdin_open: true
+    ports:
+      - "3001:3001"
+    depends_on:
+      - fise-server
+  fise-server:
+    restart: always
+    env_file:
+      - ./server/.env.local
+    build: ./server
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+  askbob:
+    build: ./askbob
+    ports:
+      - "8000:8000"
+  concierge:
+    build: ./concierge
+    ports:
+      - "8080:8080"
+      - "8100:8100"
+volumes:
+  mongo-data:
+    driver: local
